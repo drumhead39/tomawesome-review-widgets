@@ -14,13 +14,25 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Sync_Service {
 
-	/** @var Review_Repository */
+	/**
+	 * Review persistence service.
+	 *
+	 * @var Review_Repository
+	 */
 	private $repository;
 
-	/** @var Business_Profile_Client */
+	/**
+	 * Google Business Profile API client.
+	 *
+	 * @var Business_Profile_Client
+	 */
 	private $business_profile;
 
-	/** @var Places_Client */
+	/**
+	 * Google Places API client.
+	 *
+	 * @var Places_Client
+	 */
 	private $places;
 
 	/**
@@ -130,17 +142,17 @@ final class Sync_Service {
 
 		$normalized = array();
 		foreach ( $data['reviews'] as $review ) {
-			$reviewer    = is_array( $review['reviewer'] ?? null ) ? $review['reviewer'] : array();
+			$reviewer     = is_array( $review['reviewer'] ?? null ) ? $review['reviewer'] : array();
 			$normalized[] = array(
-				'external_id'         => (string) ( $review['reviewId'] ?? '' ),
-				'reviewer_name'       => (string) ( $reviewer['displayName'] ?? '' ),
-				'reviewer_photo_url'  => (string) ( $reviewer['profilePhotoUrl'] ?? '' ),
-				'reviewer_profile_url'=> '',
-				'rating'              => $this->star_rating( $review['starRating'] ?? 0 ),
-				'review_text'         => (string) ( $review['comment'] ?? '' ),
-				'review_url'          => (string) get_post_meta( $source_id, '_tarw_review_url', true ),
-				'create_time'         => (string) ( $review['createTime'] ?? '' ),
-				'update_time'         => (string) ( $review['updateTime'] ?? '' ),
+				'external_id'          => (string) ( $review['reviewId'] ?? '' ),
+				'reviewer_name'        => (string) ( $reviewer['displayName'] ?? '' ),
+				'reviewer_photo_url'   => (string) ( $reviewer['profilePhotoUrl'] ?? '' ),
+				'reviewer_profile_url' => '',
+				'rating'               => $this->star_rating( $review['starRating'] ?? 0 ),
+				'review_text'          => (string) ( $review['comment'] ?? '' ),
+				'review_url'           => (string) get_post_meta( $source_id, '_tarw_review_url', true ),
+				'create_time'          => (string) ( $review['createTime'] ?? '' ),
+				'update_time'          => (string) ( $review['updateTime'] ?? '' ),
 			);
 		}
 
@@ -164,11 +176,11 @@ final class Sync_Service {
 			return $data;
 		}
 
-		$maps_url  = (string) ( $data['googleMapsUri'] ?? '' );
+		$maps_url   = (string) ( $data['googleMapsUri'] ?? '' );
 		$normalized = array();
 		foreach ( $data['reviews'] ?? array() as $review ) {
-			$author  = is_array( $review['authorAttribution'] ?? null ) ? $review['authorAttribution'] : array();
-			$text    = is_array( $review['text'] ?? null ) ? (string) ( $review['text']['text'] ?? '' ) : '';
+			$author       = is_array( $review['authorAttribution'] ?? null ) ? $review['authorAttribution'] : array();
+			$text         = is_array( $review['text'] ?? null ) ? (string) ( $review['text']['text'] ?? '' ) : '';
 			$normalized[] = array(
 				'external_id'          => (string) ( $review['name'] ?? '' ),
 				'reviewer_name'        => (string) ( $author['displayName'] ?? '' ),

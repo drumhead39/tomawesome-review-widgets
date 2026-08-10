@@ -72,7 +72,7 @@ final class Crypto {
 			);
 		}
 
-		return self::PREFIX . base64_encode( $iv . $tag . $ciphertext );
+		return self::PREFIX . base64_encode( $iv . $tag . $ciphertext ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Encoding this plugin's authenticated encryption envelope for storage.
 	}
 
 	/**

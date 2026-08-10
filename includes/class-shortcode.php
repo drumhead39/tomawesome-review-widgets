@@ -14,7 +14,11 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Shortcode {
 
-	/** @var Review_Repository */
+	/**
+	 * Review persistence service.
+	 *
+	 * @var Review_Repository
+	 */
 	private $repository;
 
 	/**
@@ -122,16 +126,16 @@ final class Shortcode {
 	/**
 	 * Builds complete widget markup.
 	 *
-	 * @param int               $widget_id Widget post ID.
-	 * @param int               $source_id Source post ID.
+	 * @param int                 $widget_id Widget post ID.
+	 * @param int                 $source_id Source post ID.
 	 * @param array<string,mixed> $settings Widget settings.
-	 * @param array<int,object> $reviews Review records.
+	 * @param array<int,object>   $reviews Review records.
 	 * @return string
 	 */
 	private function widget_markup( $widget_id, $source_id, array $settings, array $reviews ) {
-		$layout        = in_array( $settings['layout'], array( 'grid', 'list', 'carousel', 'featured' ), true ) ? $settings['layout'] : 'grid';
+		$layout       = in_array( $settings['layout'], array( 'grid', 'list', 'carousel', 'featured' ), true ) ? $settings['layout'] : 'grid';
 		$privacy_mode = ! empty( $settings['privacy_mode'] );
-		$classes       = array( 'tarw-widget', 'tarw-layout-' . $layout );
+		$classes      = array( 'tarw-widget', 'tarw-layout-' . $layout );
 		foreach ( preg_split( '/\s+/', (string) $settings['custom_class'] ) as $class ) {
 			$class = sanitize_html_class( $class );
 			if ( '' !== $class ) {
@@ -139,17 +143,19 @@ final class Shortcode {
 			}
 		}
 
-		$columns = sprintf(
+		$columns     = sprintf(
 			'--tarw-columns-desktop:%d;--tarw-columns-tablet:%d;--tarw-columns-mobile:%d;',
 			min( 4, max( 1, absint( $settings['columns_desktop'] ) ) ),
 			min( 3, max( 1, absint( $settings['columns_tablet'] ) ) ),
 			min( 2, max( 1, absint( $settings['columns_mobile'] ) ) )
 		);
 		$source_name = get_the_title( $source_id );
+		/* translators: %s: Review source or business name. */
+		$aria_label = sprintf( __( 'Reviews for %s', 'tomawesome-review-widgets' ), $source_name );
 
 		ob_start();
 		?>
-		<section class="<?php echo esc_attr( implode( ' ', array_unique( $classes ) ) ); ?>" style="<?php echo esc_attr( $columns ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Reviews for %s', 'tomawesome-review-widgets' ), $source_name ) ); ?>" data-tarw-widget="<?php echo esc_attr( $widget_id ); ?>">
+		<section class="<?php echo esc_attr( implode( ' ', array_unique( $classes ) ) ); ?>" style="<?php echo esc_attr( $columns ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>" data-tarw-widget="<?php echo esc_attr( $widget_id ); ?>">
 			<?php if ( ! empty( $settings['show_summary'] ) ) : ?>
 				<?php echo $this->summary_markup( $source_id, $source_name ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?php endif; ?>
@@ -236,9 +242,11 @@ final class Shortcode {
 	 */
 	private function stars_markup( $rating ) {
 		$rating = min( 5, max( 0, $rating ) );
+		/* translators: %d: Rating out of five stars. */
+		$star_label = sprintf( _n( '%d out of 5 star', '%d out of 5 stars', $rating, 'tomawesome-review-widgets' ), $rating );
 		return sprintf(
 			'<div class="tarw-stars" aria-label="%1$s"><span aria-hidden="true">%2$s%3$s</span></div>',
-			esc_attr( sprintf( _n( '%d out of 5 star', '%d out of 5 stars', $rating, 'tomawesome-review-widgets' ), $rating ) ),
+			esc_attr( $star_label ),
 			esc_html( str_repeat( '★', $rating ) ),
 			esc_html( str_repeat( '☆', 5 - $rating ) )
 		);
@@ -258,12 +266,14 @@ final class Shortcode {
 		if ( $rating <= 0 ) {
 			return '';
 		}
+		/* translators: %d: Total number of Google reviews. */
+		$review_count_label = sprintf( _n( '%d Google review', '%d Google reviews', $total, 'tomawesome-review-widgets' ), $total );
 
 		return sprintf(
 			'<header class="tarw-summary"><strong>%1$s</strong><span>%2$s</span><span>%3$s</span></header>',
 			esc_html( $source_name ),
 			esc_html( number_format_i18n( $rating, 1 ) . ' / 5' ),
-			esc_html( sprintf( _n( '%d Google review', '%d Google reviews', $total, 'tomawesome-review-widgets' ), $total ) )
+			esc_html( $review_count_label )
 		);
 	}
 

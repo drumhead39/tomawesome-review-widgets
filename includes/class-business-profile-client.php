@@ -63,7 +63,7 @@ final class Business_Profile_Client {
 
 			$page_token = '';
 			do {
-				$url = add_query_arg(
+				$url  = add_query_arg(
 					array_filter(
 						array(
 							'readMask'  => 'name,title,storeCode,websiteUri,phoneNumbers,metadata',
@@ -82,9 +82,9 @@ final class Business_Profile_Client {
 					if ( ! is_array( $location ) ) {
 						continue;
 					}
-					$location['tarw_account_name'] = (string) $account['name'];
+					$location['tarw_account_name']  = (string) $account['name'];
 					$location['tarw_account_label'] = (string) ( $account['accountName'] ?? $account['name'] );
-					$locations[] = $location;
+					$locations[]                    = $location;
 				}
 
 				$page_token = isset( $data['nextPageToken'] ) ? (string) $data['nextPageToken'] : '';
@@ -109,14 +109,14 @@ final class Business_Profile_Client {
 			return new \WP_Error( 'tarw_invalid_location', __( 'The Business Profile account or location identifier is invalid.', 'tomawesome-review-widgets' ) );
 		}
 
-		$reviews      = array();
-		$page_token   = '';
-		$average      = null;
-		$total_count  = null;
-		$base_url     = 'https://mybusiness.googleapis.com/v4/accounts/' . rawurlencode( $account_id ) . '/locations/' . rawurlencode( $location_id ) . '/reviews';
+		$reviews     = array();
+		$page_token  = '';
+		$average     = null;
+		$total_count = null;
+		$base_url    = 'https://mybusiness.googleapis.com/v4/accounts/' . rawurlencode( $account_id ) . '/locations/' . rawurlencode( $location_id ) . '/reviews';
 
 		do {
-			$url = add_query_arg(
+			$url  = add_query_arg(
 				array_filter(
 					array(
 						'pageSize'  => 50,
@@ -138,9 +138,9 @@ final class Business_Profile_Client {
 		} while ( '' !== $page_token );
 
 		return array(
-			'reviews'      => $reviews,
-			'average'      => $average,
-			'total_count'  => $total_count,
+			'reviews'     => $reviews,
+			'average'     => $average,
+			'total_count' => $total_count,
 		);
 	}
 
@@ -176,6 +176,7 @@ final class Business_Profile_Client {
 		if ( $status < 200 || $status >= 300 || ! is_array( $data ) ) {
 			$message = is_array( $data ) && ! empty( $data['error']['message'] )
 				? sanitize_text_field( $data['error']['message'] )
+				/* translators: %d: HTTP status code returned by Google Business Profile. */
 				: sprintf( __( 'Google Business Profile returned HTTP %d.', 'tomawesome-review-widgets' ), $status );
 			return new \WP_Error( 'tarw_business_profile_api_error', $message, array( 'status' => $status ) );
 		}

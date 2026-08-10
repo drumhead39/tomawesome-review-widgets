@@ -68,6 +68,7 @@ final class Places_Client {
 		if ( $status < 200 || $status >= 300 || ! is_array( $data ) ) {
 			$message = is_array( $data ) && ! empty( $data['error']['message'] )
 				? sanitize_text_field( $data['error']['message'] )
+				/* translators: %d: HTTP status code returned by Google Places. */
 				: sprintf( __( 'Google Places returned HTTP %d.', 'tomawesome-review-widgets' ), $status );
 			return new \WP_Error( 'tarw_places_api_error', $message, array( 'status' => $status ) );
 		}

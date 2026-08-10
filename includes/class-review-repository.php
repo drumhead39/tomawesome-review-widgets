@@ -50,7 +50,7 @@ final class Review_Repository {
 
 		return $wpdb->query(
 			$wpdb->prepare(
-				$sql,
+				$sql, // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The plugin-owned table name cannot be a placeholder; all values use placeholders below.
 				absint( $source_id ),
 				sanitize_text_field( $review['external_id'] ?? '' ),
 				sanitize_text_field( $review['reviewer_name'] ?? '' ),
@@ -95,7 +95,7 @@ final class Review_Repository {
 		$sql      = "SELECT * FROM {$this->table()} WHERE {$where} ORDER BY {$order} LIMIT %d";
 		$values[] = $limit;
 
-		return $wpdb->get_results( $wpdb->prepare( $sql, $values ) );
+		return $wpdb->get_results( $wpdb->prepare( $sql, $values ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The table, clauses, and ordering are generated internally; all values use placeholders.
 	}
 
 	/**
@@ -197,7 +197,7 @@ final class Review_Repository {
 		$placeholders = implode( ', ', array_fill( 0, count( $external_ids ), '%s' ) );
 		$sql          = "DELETE FROM {$this->table()} WHERE source_id = %d AND external_id NOT IN ({$placeholders})";
 		$values       = array_merge( array( $source_id ), $external_ids );
-		return $wpdb->query( $wpdb->prepare( $sql, $values ) );
+		return $wpdb->query( $wpdb->prepare( $sql, $values ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The table name and placeholder list are generated internally; all values are prepared.
 	}
 
 	/**
@@ -252,10 +252,10 @@ final class Review_Repository {
 	 */
 	private function order_clause( $sort ) {
 		$clauses = array(
-			'newest' => 'COALESCE(update_time, create_time) DESC, id DESC',
-			'oldest' => 'COALESCE(create_time, update_time) ASC, id ASC',
-			'highest'=> 'rating DESC, COALESCE(update_time, create_time) DESC',
-			'random' => 'RAND()',
+			'newest'  => 'COALESCE(update_time, create_time) DESC, id DESC',
+			'oldest'  => 'COALESCE(create_time, update_time) ASC, id ASC',
+			'highest' => 'rating DESC, COALESCE(update_time, create_time) DESC',
+			'random'  => 'RAND()',
 		);
 		return $clauses[ $sort ] ?? $clauses['newest'];
 	}
