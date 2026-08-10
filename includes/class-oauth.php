@@ -65,14 +65,14 @@ final class OAuth {
 
 		return add_query_arg(
 			array(
-				'client_id'     => $client_id,
-				'redirect_uri'  => $this->redirect_uri(),
-				'response_type' => 'code',
-				'scope'         => self::SCOPE,
-				'access_type'   => 'offline',
-				'prompt'        => 'consent',
+				'client_id'              => $client_id,
+				'redirect_uri'           => $this->redirect_uri(),
+				'response_type'          => 'code',
+				'scope'                  => self::SCOPE,
+				'access_type'            => 'offline',
+				'prompt'                 => 'consent',
 				'include_granted_scopes' => 'true',
-				'state'         => $state,
+				'state'                  => $state,
 			),
 			'https://accounts.google.com/o/oauth2/v2/auth'
 		);

@@ -21,7 +21,9 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="tomawesome-review-widgets"/>
+			<property name="text_domain" type="array">
+				<element value="tomawesome-review-widgets"/>
+			</property>
 		</properties>
 	</rule>
 

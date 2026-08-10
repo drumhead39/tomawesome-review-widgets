@@ -75,44 +75,44 @@ final class Plugin {
 		register_post_type(
 			'tarw_widget',
 			array(
-				'labels'          => array(
+				'labels'           => array(
 					'name'          => __( 'Review Widgets', 'tomawesome-review-widgets' ),
 					'singular_name' => __( 'Review Widget', 'tomawesome-review-widgets' ),
 					'add_new_item'  => __( 'Add Review Widget', 'tomawesome-review-widgets' ),
 					'edit_item'     => __( 'Edit Review Widget', 'tomawesome-review-widgets' ),
 				),
-				'public'          => false,
-				'show_ui'         => true,
-				'show_in_menu'    => true,
-				'menu_icon'       => 'dashicons-star-filled',
-				'menu_position'   => 58,
-				'supports'        => array( 'title' ),
-				'capabilities'    => $capabilities,
-				'map_meta_cap'    => false,
-				'show_in_rest'    => false,
-				'can_export'      => true,
-				'delete_with_user'=> false,
+				'public'           => false,
+				'show_ui'          => true,
+				'show_in_menu'     => true,
+				'menu_icon'        => 'dashicons-star-filled',
+				'menu_position'    => 58,
+				'supports'         => array( 'title' ),
+				'capabilities'     => $capabilities,
+				'map_meta_cap'     => false,
+				'show_in_rest'     => false,
+				'can_export'       => true,
+				'delete_with_user' => false,
 			)
 		);
 
 		register_post_type(
 			'tarw_source',
 			array(
-				'labels'          => array(
+				'labels'           => array(
 					'name'          => __( 'Review Sources', 'tomawesome-review-widgets' ),
 					'singular_name' => __( 'Review Source', 'tomawesome-review-widgets' ),
 					'add_new_item'  => __( 'Add Review Source', 'tomawesome-review-widgets' ),
 					'edit_item'     => __( 'Edit Review Source', 'tomawesome-review-widgets' ),
 				),
-				'public'          => false,
-				'show_ui'         => true,
-				'show_in_menu'    => 'edit.php?post_type=tarw_widget',
-				'supports'        => array( 'title' ),
-				'capabilities'    => $capabilities,
-				'map_meta_cap'    => false,
-				'show_in_rest'    => false,
-				'can_export'      => true,
-				'delete_with_user'=> false,
+				'public'           => false,
+				'show_ui'          => true,
+				'show_in_menu'     => 'edit.php?post_type=tarw_widget',
+				'supports'         => array( 'title' ),
+				'capabilities'     => $capabilities,
+				'map_meta_cap'     => false,
+				'show_in_rest'     => false,
+				'can_export'       => true,
+				'delete_with_user' => false,
 			)
 		);
 	}
