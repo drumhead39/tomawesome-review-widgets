@@ -32,7 +32,13 @@ jobs:
     needs: php
     steps:
       - uses: actions/checkout@v4
-      - run: git archive --format=zip --prefix=tomawesome-review-widgets/ --output=tomawesome-review-widgets.zip HEAD
+      - name: Build distribution ZIP
+        run: |
+          distribution_dir="${RUNNER_TEMP}/tomawesome-review-widgets"
+          mkdir -p "${distribution_dir}"
+          rsync -rc --exclude-from=.distignore ./ "${distribution_dir}/"
+          cd "${RUNNER_TEMP}"
+          zip -qr "${GITHUB_WORKSPACE}/tomawesome-review-widgets.zip" tomawesome-review-widgets
       - uses: actions/upload-artifact@v4
         with:
           name: tomawesome-review-widgets

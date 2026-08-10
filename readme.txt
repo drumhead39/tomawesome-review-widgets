@@ -3,7 +3,7 @@ Contributors: tomawesome
 Tags: reviews, google reviews, testimonials, business profile, healthcare
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -79,7 +79,7 @@ TomAwesome Review Widgets is not affiliated with, sponsored by, or endorsed by G
 
 1. Upload the plugin ZIP through Plugins > Add New > Upload Plugin, or copy the `tomawesome-review-widgets` directory into `/wp-content/plugins/`.
 2. Activate TomAwesome Review Widgets.
-3. Go to Review Widgets > Google Connection.
+3. WordPress opens Review Widgets > Getting Started with a setup checklist and two connection paths.
 4. Choose a connection method:
    * For complete reviews from managed businesses, configure an approved Google Business Profile API project and OAuth Web application.
    * For a public Place, configure a Places API (New) key. Google returns up to five selected reviews.
@@ -87,7 +87,7 @@ TomAwesome Review Widgets is not affiliated with, sponsored by, or endorsed by G
 6. Go to Review Widgets > Add New, name and configure the widget, then publish it.
 7. Copy the generated shortcode into a page, post, or page-builder shortcode element.
 
-The detailed setup guide is included at `docs/INSTALLATION.md` in the plugin package.
+The Getting Started page remains available in the Review Widgets menu. The detailed Google Cloud and OAuth setup guide is also included at `docs/INSTALLATION.md` in the plugin package.
 
 == Frequently Asked Questions ==
 
@@ -125,6 +125,15 @@ By default, saved configuration and content remain to prevent accidental data lo
 
 == Changelog ==
 
+= 0.2.0 =
+
+* Added a guided Getting Started screen and live setup progress.
+* Added an automatic onboarding redirect after activation.
+* Added direct Getting Started and Google Connection links on the Plugins screen.
+* Expanded the managed Business Profile setup instructions for first-time Google Cloud users.
+* Clarified API-project approval, OAuth test users, redirect URIs, and production readiness.
+* Corrected administrator coding-standard issues and release packaging exclusions.
+
 = 0.1.0 =
 
 * Initial developer preview.
@@ -136,6 +145,10 @@ By default, saved configuration and content remain to prevent accidental data lo
 * Added responsive, accessible front-end rendering and reduced-motion support.
 
 == Upgrade Notice ==
+
+= 0.2.0 =
+
+Adds first-run onboarding and a substantially clearer Google Business Profile setup guide. Continue testing on a staging site.
 
 = 0.1.0 =
 

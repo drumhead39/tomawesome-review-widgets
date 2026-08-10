@@ -2,6 +2,11 @@
 	max-width: 1100px;
 }
 
+.tarw-lead {
+	font-size: 1.15rem;
+	max-width: 780px;
+}
+
 .tarw-admin-card,
 .tarw-privacy-panel,
 .tarw-review-editor {
@@ -10,6 +15,123 @@
 	box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
 	margin: 1rem 0;
 	padding: 1rem 1.25rem;
+}
+
+.tarw-path-grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tarw-path-card {
+	margin-top: 0;
+}
+
+.tarw-path-card h3 {
+	font-size: 1.25rem;
+	margin-top: .35rem;
+}
+
+.tarw-path-label {
+	color: #646970;
+	font-size: .75rem;
+	font-weight: 700;
+	letter-spacing: .04em;
+	margin-bottom: 0;
+	text-transform: uppercase;
+}
+
+.tarw-setup-progress {
+	display: grid;
+	gap: 0;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	list-style: none;
+	margin: 0;
+}
+
+.tarw-setup-progress li {
+	align-items: flex-start;
+	border-bottom: 1px solid #dcdcde;
+	display: grid;
+	gap: .75rem;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	margin: 0;
+	padding: .9rem;
+}
+
+.tarw-setup-progress li:nth-last-child(-n+2) {
+	border-bottom: 0;
+}
+
+.tarw-setup-progress .dashicons {
+	font-size: 24px;
+	height: 24px;
+	width: 24px;
+}
+
+.tarw-setup-complete .dashicons {
+	color: #008a20;
+}
+
+.tarw-setup-incomplete .dashicons {
+	color: #996800;
+}
+
+.tarw-setup-state {
+	font-weight: 600;
+}
+
+.tarw-guide-card {
+	scroll-margin-top: 40px;
+}
+
+.tarw-guide-card > h2 {
+	font-size: 1.45rem;
+}
+
+.tarw-numbered-guide {
+	counter-reset: tarw-guide;
+	list-style: none;
+	margin-left: 0;
+}
+
+.tarw-numbered-guide > li {
+	border-top: 1px solid #dcdcde;
+	counter-increment: tarw-guide;
+	margin: 0;
+	padding: 1rem 0 1rem 3.25rem;
+	position: relative;
+}
+
+.tarw-numbered-guide > li::before {
+	align-items: center;
+	background: #2271b1;
+	border-radius: 50%;
+	color: #fff;
+	content: counter(tarw-guide);
+	display: flex;
+	font-size: 1rem;
+	font-weight: 700;
+	height: 2rem;
+	justify-content: center;
+	left: 0;
+	position: absolute;
+	top: 1rem;
+	width: 2rem;
+}
+
+.tarw-numbered-guide h3 {
+	margin-top: 0;
+}
+
+.tarw-api-list {
+	columns: 2;
+}
+
+.tarw-redirect-uri {
+	display: block;
+	overflow-wrap: anywhere;
+	padding: .75rem;
 }
 
 .tarw-admin-grid {
@@ -87,7 +209,17 @@
 	.tarw-admin-grid,
 	.tarw-admin-grid-3,
 	.tarw-checks,
-	.tarw-review-editor {
+	.tarw-review-editor,
+	.tarw-path-grid,
+	.tarw-setup-progress {
 		grid-template-columns: 1fr;
+	}
+
+	.tarw-setup-progress li:nth-last-child(2) {
+		border-bottom: 1px solid #dcdcde;
+	}
+
+	.tarw-api-list {
+		columns: 1;
 	}
 }

@@ -7,44 +7,140 @@ TomAwesome Review Widgets supports two Google connection methods. Use Google Bus
 1. In WordPress, open **Plugins > Add New > Upload Plugin**.
 2. Select the `tomawesome-review-widgets.zip` file.
 3. Choose **Install Now**, then **Activate Plugin**.
-4. Open **Review Widgets > Google Connection**.
+4. WordPress will open **Review Widgets > Getting Started**. Choose the connection method that fits your use case.
+
+You can return to the onboarding checklist at any time from **Review Widgets > Getting Started**. The Plugins screen also includes **Getting Started** and **Google Connection** links beneath the plugin name.
 
 The site must run WordPress 6.2 or newer, PHP 7.4 or newer, HTTPS, and PHP OpenSSL. HTTPS protects the OAuth callback and OpenSSL allows the plugin to encrypt credentials at rest.
 
 ## 2A. Complete-review setup for managed businesses
 
-Google Business Profile is the recommended source when you own or are authorized to manage the listing. Google requires application approval before this API becomes available.
+Google Business Profile is the recommended source when you own or are authorized to manage the listing. It can provide the complete, paginated review history instead of the small sample returned by Places.
 
-### Prepare Google Cloud
+There are **two separate Google approval concepts** in this setup:
 
-1. Sign in with a Google account that manages a verified, active Business Profile.
-2. Create or choose a Google Cloud project owned by the appropriate organization.
-3. Complete Google's [Business Profile API prerequisites](https://developers.google.com/my-business/content/prereqs), including its access application. Do not continue until Google approves the project.
-4. Enable at least these APIs in the approved project:
+1. **Business Profile API access** gives one Google Cloud project permission and quota to call the API. You request this through Google's Business Profile API access form.
+2. **OAuth publishing or verification** governs who may authorize the application. You configure this under Google Auth Platform. Testing mode is enough for an initial connection, but it is not suitable for dependable long-term synchronization.
+
+Finishing one does not automatically finish the other.
+
+### 2A-1. Confirm that the Google account is eligible
+
+Use a Google account listed as an **Owner** or **Manager** of the Business Profile:
+
+1. Sign in to Google and search for the business name or `my business`.
+2. Open the three-dot menu in the private Business Profile controls.
+3. Choose **Business Profile settings > People and access**.
+4. Confirm the email address shown as an Owner or Manager. Use that exact account for the access application, OAuth test user, and WordPress connection.
+
+Google currently requires applicants to manage a verified, active Business Profile that has existed for at least 60 days and has a website representing the business. Review [Google's current prerequisites](https://developers.google.com/my-business/content/prereqs) before applying.
+
+### 2A-2. Create a dedicated Google Cloud project
+
+1. Open [Google Cloud Console](https://console.cloud.google.com/).
+2. Use the project selector in the top bar and choose **New Project**.
+3. Give the project a recognizable name such as `Example Business Review Widgets`.
+4. Create the project and make sure it remains selected for every following step.
+5. Open **Cloud Overview > Dashboard** and locate **Project info**.
+6. Copy the numeric **Project number**. Do not substitute the project name or project ID; Google's access form asks for the project number.
+
+Google grants Business Profile API access to this specific project. Creating OAuth credentials in a different project will not inherit the approval.
+
+### 2A-3. Apply for Business Profile API access
+
+1. With the correct project selected, open Google's [Business Profile API access form](https://support.google.com/business/contact/api_default).
+2. Choose **Application for Basic API Access** from the request type.
+3. Complete the form using the Google account that owns or manages the Business Profile.
+4. Enter the project number copied in the previous section.
+5. Submit the request and wait for Google's response before attempting to connect the plugin.
+
+Approval is not immediate and the plugin developer cannot approve the project. Google says you can check the result in Google Cloud by viewing the Business Profile API quota:
+
+- **0 QPM** means access has not been granted.
+- **300 QPM** means the project has been approved.
+
+Do not request a quota increase when the quota is zero; complete the basic-access application instead.
+
+### 2A-4. Enable the Business Profile APIs
+
+After Google approves the project:
+
+1. Open **APIs & Services > Library** in Google Cloud.
+2. Search for each API below, open it, and choose **Enable**:
    - Google My Business API
    - My Business Account Management API
+   - My Business Lodging API
+   - My Business Place Actions API
+   - My Business Notifications API
+   - My Business Verifications API
    - My Business Business Information API
-5. Configure the OAuth consent screen with accurate application, support, homepage, privacy-policy, and terms links.
-6. Add the scope `https://www.googleapis.com/auth/business.manage`.
-7. Create an OAuth client with application type **Web application**.
-8. In WordPress, copy the exact **Authorized redirect URI** shown under **Review Widgets > Google Connection**.
-9. Add that URI to the OAuth client's **Authorized redirect URIs** in Google Cloud. The scheme, domain, path, and query string must match exactly.
+   - My Business Q&A API
+3. Confirm the APIs appear under **APIs & Services > Enabled APIs & services**.
 
-Public OAuth applications may require Google verification. The site owner—not the plugin author—owns and controls this Google Cloud project and is responsible for Google's current access, consent-screen, verification, and policy requirements.
+Google currently lists all eight as part of the required Business Profile suite. See Google's [current Basic setup page](https://developers.google.com/my-business/content/basic-setup#enable-the-apis) if an API name or menu changes.
+
+The **Google My Business API** may not appear in the API Library until Google approves the account and project.
+
+### 2A-5. Configure Google Auth Platform
+
+1. In the same Cloud project, open **Google Auth Platform > Overview**.
+2. If Google displays **Get started**, complete the initial form:
+   - Enter an accurate application name. This is what users will see on Google's authorization screen.
+   - Select a monitored **User support email**.
+   - Choose **External** as the audience unless every authorized user belongs to the same eligible Google Workspace organization.
+   - Enter a monitored developer contact email.
+3. Open **Branding** and add accurate application information:
+   - Homepage URL
+   - Privacy Policy URL
+   - Terms of Service URL
+   - Authorized domain for the WordPress site
+4. Open **Audience**. For the first connection, leave the publishing status as **Testing**.
+5. Under **Test users**, add the exact Google account identified in section 2A-1. A manager using a non-Gmail address may still have a Google Account; enter the actual address shown in Google.
+6. Open **Data Access**, choose **Add or remove scopes**, and add:
+
+   ```text
+   https://www.googleapis.com/auth/business.manage
+   ```
+
+If Google displays “Access blocked” during the first connection, the most common cause is that the signed-in account was not added under **Audience > Test users**, or a different Cloud project was configured.
+
+### 2A-6. Create the OAuth web client
+
+1. Open **Google Auth Platform > Clients**.
+2. Choose **Create client**.
+3. For **Application type**, select **Web application**.
+4. Enter a recognizable name such as `Review Widgets on example.com`.
+5. In WordPress, open **Review Widgets > Google Connection**.
+6. Copy the complete **Authorized redirect URI** displayed by the plugin.
+7. Back in Google Cloud, paste it under **Authorized redirect URIs**. Do not place it under Authorized JavaScript origins.
+8. Choose **Create**.
+9. Copy the generated **Client ID** and **Client secret**. Do not publish either value or commit it to GitHub.
+
+The redirect URI must be an exact match. The protocol (`https`), domain, path, and query string all matter. A mismatch produces Google's `redirect_uri_mismatch` error.
+
+### 2A-7. Connect WordPress and import locations
+
+1. In WordPress, open **Review Widgets > Google Connection**.
+2. Paste the OAuth Client ID and Client secret and choose **Save connection settings**.
+3. Choose **Connect Google Business Profile**.
+4. At Google, select the same Owner or Manager account that you added as a test user.
+5. Review the requested access and approve it.
+6. After WordPress reports a successful connection, choose **Discover managed locations**.
+7. Select **Add as review source** beside each location you want to use.
+8. Open each imported source and verify its **Read all reviews** and **Leave a review** URLs.
+9. Choose **Synchronize now**.
+
+One OAuth connection can provide multiple managed locations. Each imported location becomes an independent Review Source that may be reused by any number of widgets.
+
+### 2A-8. Move beyond Testing before relying on automatic sync
+
+Testing mode is useful for confirming the setup, but Google generally expires refresh tokens after seven days when an External app requests scopes beyond basic identity information. When that token expires, daily synchronization stops until an administrator reconnects.
+
+Before production use, open **Google Auth Platform > Audience** and review Google's current publishing and verification requirements. The appropriate route depends on whether the OAuth app is strictly for the site owner's limited personal use or will be offered to additional users. Public or broadly distributed OAuth applications may require Google verification.
+
+The site owner—not the plugin author—owns and controls the Google Cloud project and is responsible for Google's current access, consent-screen, verification, and policy requirements.
 
 This is self-hosted open-source software: each site operator independently owns and operates its API project. Do not share one approved project, credentials, or indirect API access across unrelated client sites. Agencies and platforms should review Google's restrictions for end-client and third-party use and contact Google before deploying this workflow for clients.
-
-### Connect WordPress
-
-1. Copy the OAuth client ID and client secret from Google Cloud.
-2. Paste both under **Review Widgets > Google Connection** and save.
-3. Choose **Connect Google Business Profile**.
-4. Sign in manually, review Google's consent screen, and approve access.
-5. Back in WordPress, choose **Discover managed locations**.
-6. Select **Add as review source** beside each needed location.
-7. Open each imported source, verify its “Read all reviews” and “Leave a review” URLs, then choose **Synchronize now**.
-
-One OAuth connection can provide multiple managed locations. Each imported location is an independent Review Source.
 
 ## 2B. Public Places setup
 

@@ -2,6 +2,16 @@
 
 All notable changes to TomAwesome Review Widgets are documented here.
 
+## 0.2.0 — 2026-08-10
+
+- Added a Getting Started screen with connection-path guidance and live setup progress.
+- Added an automatic first-run redirect after plugin activation.
+- Added permanent Getting Started and Google Connection links to the Plugins screen.
+- Expanded the managed Business Profile instructions with exact Cloud project, API access, API enablement, OAuth test-user, scope, redirect URI, and production-readiness steps.
+- Clarified that Business Profile API approval and OAuth app verification are separate Google processes.
+- Corrected existing WordPress Coding Standards issues in the administrator and uninstall routines.
+- Updated GitHub Actions packaging to honor `.distignore` and exclude development-only files from release ZIPs.
+
 ## 0.1.0 — 2026-08-10
 
 - Initial developer preview.

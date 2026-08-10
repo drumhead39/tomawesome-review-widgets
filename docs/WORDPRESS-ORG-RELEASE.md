@@ -1,6 +1,6 @@
 # WordPress.org release checklist
 
-Do not submit version 0.1.0 until it has completed real Google API and staging-site testing. The first public-directory candidate should be version 1.0.0.
+Do not submit a developer-preview version until it has completed real Google API and staging-site testing. The first public-directory candidate should be version 1.0.0.
 
 ## Before requesting a slug
 

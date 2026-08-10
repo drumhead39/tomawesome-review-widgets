@@ -29,13 +29,14 @@ foreach ( $tarw_post_ids as $tarw_post_id ) {
 }
 
 $tarw_table = $wpdb->prefix . 'tarw_reviews';
-$wpdb->query( "DROP TABLE IF EXISTS {$tarw_table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$wpdb->query( "DROP TABLE IF EXISTS {$tarw_table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- The plugin's custom table must be removed directly during an administrator-approved destructive uninstall.
 
 delete_option( 'tarw_settings' );
 delete_option( 'tarw_db_version' );
+delete_option( 'tarw_activation_redirect' );
 wp_clear_scheduled_hook( 'tarw_daily_sync' );
 
-$tarw_state_transients = $wpdb->get_col(
+$tarw_state_transients = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall must find all plugin-owned OAuth state transients; the result is not reusable.
 	$wpdb->prepare(
 		"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
 		$wpdb->esc_like( '_transient_tarw_oauth_state_' ) . '%'

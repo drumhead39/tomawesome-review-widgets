@@ -17,9 +17,10 @@ final class Activator {
 	/**
 	 * Creates storage and schedules synchronization.
 	 *
+	 * @param bool $network_wide Whether WordPress activated the plugin network-wide.
 	 * @return void
 	 */
-	public static function activate() {
+	public static function activate( $network_wide = false ) {
 		self::create_table();
 
 		if ( ! wp_next_scheduled( 'tarw_daily_sync' ) ) {
@@ -27,6 +28,11 @@ final class Activator {
 		}
 
 		update_option( 'tarw_db_version', TARW_VERSION, false );
+
+		if ( ! $network_wide ) {
+			update_option( 'tarw_activation_redirect', 1, false );
+		}
+
 		flush_rewrite_rules();
 	}
 
