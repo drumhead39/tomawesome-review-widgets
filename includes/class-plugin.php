@@ -139,7 +139,10 @@ final class Plugin {
 			return;
 		}
 
-		$content = '<p>' . esc_html__( 'This site uses TomAwesome Review Widgets to retrieve and display public review content from Google services. Depending on widget settings, a visitor\'s browser may request a reviewer profile image from Google. Google may receive the visitor\'s IP address and browser information. Healthcare Privacy Mode prevents profile images and reviewer links from loading, but does not by itself establish compliance with any law.', 'tomawesome-review-widgets' ) . '</p>';
+		$content  = '<p>' . esc_html__( 'This site uses TomAwesome Review Widgets to retrieve and display public review content from Google services. For Google Places sources, the widget displays available reviewer attribution and a visitor’s browser may request the reviewer’s profile image from Google. Google may receive the visitor’s IP address and browser information. Healthcare Privacy Mode is unavailable for Places sources because it conflicts with Google Maps author-attribution requirements. For supported source types, that mode does not by itself establish compliance with any law.', 'tomawesome-review-widgets' ) . '</p>';
+		$content .= '<p>' . esc_html__( 'Google Maps content is provided under Google’s terms and privacy practices.', 'tomawesome-review-widgets' ) . ' ';
+		$content .= '<a href="https://policies.google.com/terms">' . esc_html__( 'Google Terms of Service', 'tomawesome-review-widgets' ) . '</a> · ';
+		$content .= '<a href="https://policies.google.com/privacy">' . esc_html__( 'Google Privacy Policy', 'tomawesome-review-widgets' ) . '</a></p>';
 
 		wp_add_privacy_policy_content(
 			__( 'TomAwesome Review Widgets', 'tomawesome-review-widgets' ),

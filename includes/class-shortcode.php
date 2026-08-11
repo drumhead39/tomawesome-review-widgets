@@ -75,6 +75,16 @@ final class Shortcode {
 				? '<p class="tarw-message">' . esc_html__( 'Choose a review source in this widget’s settings.', 'tomawesome-review-widgets' ) . '</p>'
 				: '';
 		}
+		$is_places = 'places' === get_post_meta( $source_id, '_tarw_source_type', true );
+		if ( $is_places && '2026-08-07' !== get_post_meta( $source_id, '_tarw_places_policy_sync', true ) ) {
+			return current_user_can( 'manage_options' )
+				? '<p class="tarw-message">' . esc_html__( 'Synchronize this Places source once after updating the plugin so the widget can store and display Google Maps’ current required attribution and individual review links.', 'tomawesome-review-widgets' ) . '</p>'
+				: '';
+		}
+		if ( $is_places ) {
+			$settings['privacy_mode'] = 0;
+			$settings['show_avatar']  = 1;
+		}
 
 		$reviews = $this->repository->get_for_widget( $source_id, $settings );
 		if ( empty( $reviews ) ) {
@@ -103,6 +113,7 @@ final class Shortcode {
 			$stored,
 			array(
 				'source_id'       => 0,
+				'public_heading'  => '',
 				'layout'          => 'grid',
 				'limit'           => 6,
 				'min_rating'      => 4,
@@ -118,6 +129,7 @@ final class Shortcode {
 				'columns_tablet'  => 2,
 				'columns_mobile'  => 1,
 				'privacy_mode'    => 0,
+				'style'           => array(),
 				'custom_class'    => '',
 			)
 		);
@@ -134,8 +146,12 @@ final class Shortcode {
 	 */
 	private function widget_markup( $widget_id, $source_id, array $settings, array $reviews ) {
 		$layout       = in_array( $settings['layout'], array( 'grid', 'list', 'carousel', 'featured' ), true ) ? $settings['layout'] : 'grid';
-		$privacy_mode = ! empty( $settings['privacy_mode'] );
+		$is_places    = 'places' === get_post_meta( $source_id, '_tarw_source_type', true );
+		$privacy_mode = Widget_Display::privacy_mode( ! empty( $settings['privacy_mode'] ), $is_places );
 		$classes      = array( 'tarw-widget', 'tarw-layout-' . $layout );
+		if ( $is_places ) {
+			$classes[] = 'tarw-source-places';
+		}
 		foreach ( preg_split( '/\s+/', (string) $settings['custom_class'] ) as $class ) {
 			$class = sanitize_html_class( $class );
 			if ( '' !== $class ) {
@@ -143,26 +159,30 @@ final class Shortcode {
 			}
 		}
 
-		$columns     = sprintf(
+		$inline_style  = sprintf(
 			'--tarw-columns-desktop:%d;--tarw-columns-tablet:%d;--tarw-columns-mobile:%d;',
 			min( 4, max( 1, absint( $settings['columns_desktop'] ) ) ),
 			min( 3, max( 1, absint( $settings['columns_tablet'] ) ) ),
 			min( 2, max( 1, absint( $settings['columns_mobile'] ) ) )
 		);
-		$source_name = get_the_title( $source_id );
-		/* translators: %s: Review source or business name. */
-		$aria_label = sprintf( __( 'Reviews for %s', 'tomawesome-review-widgets' ), $source_name );
+		$inline_style .= Widget_Display::inline_style( is_array( $settings['style'] ) ? $settings['style'] : array() );
+		$business_name = $this->public_business_name( $source_id, $settings );
+		/* translators: %s: Public business name or review-widget heading. */
+		$aria_label = sprintf( __( 'Reviews for %s', 'tomawesome-review-widgets' ), $business_name );
 
 		ob_start();
 		?>
-		<section class="<?php echo esc_attr( implode( ' ', array_unique( $classes ) ) ); ?>" style="<?php echo esc_attr( $columns ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>" data-tarw-widget="<?php echo esc_attr( $widget_id ); ?>">
+		<section class="<?php echo esc_attr( implode( ' ', array_unique( $classes ) ) ); ?>" style="<?php echo esc_attr( $inline_style ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>" data-tarw-widget="<?php echo esc_attr( $widget_id ); ?>">
 			<?php if ( ! empty( $settings['show_summary'] ) ) : ?>
-				<?php echo $this->summary_markup( $source_id, $source_name ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo $this->summary_markup( $source_id, $business_name ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php endif; ?>
+			<?php if ( $is_places ) : ?>
+				<p class="tarw-filter-notice"><?php echo esc_html( Widget_Display::places_filter_notice( $settings ) ); ?></p>
 			<?php endif; ?>
 
 			<div class="tarw-reviews"<?php echo 'carousel' === $layout ? ' role="region" aria-roledescription="carousel"' : ''; ?>>
 				<?php foreach ( $reviews as $review ) : ?>
-					<?php echo $this->review_markup( $review, $settings, $privacy_mode ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php echo $this->review_markup( $review, $settings, $privacy_mode, $is_places ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php endforeach; ?>
 			</div>
 
@@ -173,7 +193,7 @@ final class Shortcode {
 				</div>
 			<?php endif; ?>
 
-			<?php echo $this->footer_markup( $source_id, $settings, $privacy_mode ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo $this->footer_markup( $source_id, $settings, $privacy_mode, $is_places ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?php if ( $privacy_mode ) : ?>
 				<p class="tarw-privacy-note"><?php esc_html_e( 'Reviewer identity and identifying details have been suppressed by this site.', 'tomawesome-review-widgets' ); ?></p>
 			<?php endif; ?>
@@ -183,18 +203,34 @@ final class Shortcode {
 	}
 
 	/**
+	 * Resolves the visitor-facing business name without exposing the internal
+	 * review-source title.
+	 *
+	 * @param int                 $source_id Source post ID.
+	 * @param array<string,mixed> $settings Widget settings.
+	 * @return string
+	 */
+	private function public_business_name( $source_id, array $settings ) {
+		return Widget_Display::business_name(
+			$settings['public_heading'] ?? '',
+			get_post_meta( $source_id, '_tarw_business_name', true )
+		);
+	}
+
+	/**
 	 * Builds one review card.
 	 *
 	 * @param object              $review Review record.
 	 * @param array<string,mixed> $settings Widget settings.
 	 * @param bool                $privacy_mode Whether privacy mode is enforced.
+	 * @param bool                $is_places Whether this review came from Places API (New).
 	 * @return string
 	 */
-	private function review_markup( $review, array $settings, $privacy_mode ) {
+	private function review_markup( $review, array $settings, $privacy_mode, $is_places ) {
 		$name       = $privacy_mode ? Privacy::anonymous_label() : (string) $review->reviewer_name;
 		$text       = $privacy_mode ? (string) $review->privacy_excerpt : (string) $review->review_text;
 		$profile    = $privacy_mode ? '' : (string) $review->reviewer_profile_url;
-		$show_image = ! $privacy_mode && ! empty( $settings['show_avatar'] ) && ! empty( $review->reviewer_photo_url );
+		$show_image = Widget_Display::show_reviewer_photo( $is_places, $privacy_mode, ! empty( $settings['show_avatar'] ), (string) $review->reviewer_photo_url );
 		$show_date  = ! $privacy_mode && ! empty( $settings['show_date'] ) && ! empty( $review->create_time );
 		$max_chars  = min( 2000, max( 0, absint( $settings['max_chars'] ) ) );
 		$short_text = $max_chars ? wp_html_excerpt( $text, $max_chars, '…' ) : $text;
@@ -229,6 +265,9 @@ final class Shortcode {
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>
+			<?php if ( $is_places && ! empty( $review->review_url ) ) : ?>
+				<p class="tarw-review-source"><a href="<?php echo esc_url( $review->review_url ); ?>" target="_blank" rel="nofollow noopener noreferrer"><?php esc_html_e( 'View this review on Google Maps', 'tomawesome-review-widgets' ); ?></a></p>
+			<?php endif; ?>
 		</article>
 		<?php
 		return ob_get_clean();
@@ -256,10 +295,10 @@ final class Shortcode {
 	 * Builds the optional business summary.
 	 *
 	 * @param int    $source_id Source post ID.
-	 * @param string $source_name Source name.
+	 * @param string $business_name Public business name or custom heading.
 	 * @return string
 	 */
-	private function summary_markup( $source_id, $source_name ) {
+	private function summary_markup( $source_id, $business_name ) {
 		$rating = (float) get_post_meta( $source_id, '_tarw_rating', true );
 		$total  = absint( get_post_meta( $source_id, '_tarw_total_review_count', true ) );
 
@@ -271,7 +310,7 @@ final class Shortcode {
 
 		return sprintf(
 			'<header class="tarw-summary"><strong>%1$s</strong><span>%2$s</span><span>%3$s</span></header>',
-			esc_html( $source_name ),
+			esc_html( $business_name ),
 			esc_html( number_format_i18n( $rating, 1 ) . ' / 5' ),
 			esc_html( $review_count_label )
 		);
@@ -283,16 +322,24 @@ final class Shortcode {
 	 * @param int                 $source_id Source post ID.
 	 * @param array<string,mixed> $settings Widget settings.
 	 * @param bool                $privacy_mode Whether privacy mode is enforced.
+	 * @param bool                $is_places Whether the selected source uses Places API (New).
 	 * @return string
 	 */
-	private function footer_markup( $source_id, array $settings, $privacy_mode ) {
+	private function footer_markup( $source_id, array $settings, $privacy_mode, $is_places ) {
 		$reviews_url = esc_url( get_post_meta( $source_id, '_tarw_review_url', true ) );
 		$leave_url   = esc_url( get_post_meta( $source_id, '_tarw_leave_review_url', true ) );
 
 		ob_start();
 		?>
 		<footer class="tarw-footer">
-			<span class="tarw-attribution"><?php esc_html_e( 'Reviews from Google', 'tomawesome-review-widgets' ); ?></span>
+			<span class="tarw-attribution">
+				<?php if ( $is_places ) : ?>
+					<span class="tarw-google-maps-attribution" translate="no" aria-label="Google Maps">Google Maps</span>
+					<?php echo $this->places_provider_attributions( $source_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php else : ?>
+					<?php esc_html_e( 'Reviews from Google', 'tomawesome-review-widgets' ); ?>
+				<?php endif; ?>
+			</span>
 			<?php if ( ! $privacy_mode ) : ?>
 			<span class="tarw-actions">
 				<?php if ( ! empty( $settings['show_read_all'] ) && $reviews_url ) : ?>
@@ -306,5 +353,39 @@ final class Shortcode {
 		</footer>
 		<?php
 		return ob_get_clean();
+	}
+
+	/**
+	 * Renders any third-party data providers returned with a Places result.
+	 *
+	 * @param int $source_id Source post ID.
+	 * @return string
+	 */
+	private function places_provider_attributions( $source_id ) {
+		$attributions = get_post_meta( $source_id, '_tarw_place_attributions', true );
+		if ( ! is_array( $attributions ) || empty( $attributions ) ) {
+			return '';
+		}
+
+		$providers = array();
+		foreach ( $attributions as $attribution ) {
+			if ( ! is_array( $attribution ) ) {
+				continue;
+			}
+			$name = sanitize_text_field( $attribution['provider'] ?? '' );
+			$url  = esc_url( $attribution['provider_uri'] ?? '' );
+			if ( '' === $name ) {
+				continue;
+			}
+			$providers[] = $url
+				? '<a href="' . esc_url( $url ) . '" target="_blank" rel="nofollow noopener noreferrer">' . esc_html( $name ) . '</a>'
+				: esc_html( $name );
+		}
+
+		if ( empty( $providers ) ) {
+			return '';
+		}
+
+		return '<span class="tarw-provider-attributions">' . esc_html__( 'Data:', 'tomawesome-review-widgets' ) . ' ' . implode( ', ', $providers ) . '</span>';
 	}
 }

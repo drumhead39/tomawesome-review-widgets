@@ -218,8 +218,9 @@ final class Admin {
 			return;
 		}
 
-		wp_enqueue_style( 'tarw-admin', TARW_URL . 'assets/css/admin.css', array(), TARW_VERSION );
-		wp_enqueue_script( 'tarw-admin', TARW_URL . 'assets/js/admin.js', array(), TARW_VERSION, true );
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_style( 'tarw-admin', TARW_URL . 'assets/css/admin.css', array( 'wp-color-picker' ), TARW_VERSION );
+		wp_enqueue_script( 'tarw-admin', TARW_URL . 'assets/js/admin.js', array( 'wp-color-picker' ), TARW_VERSION, true );
 	}
 
 	/**
@@ -231,6 +232,7 @@ final class Admin {
 	public function render_widget_box( $post ) {
 		wp_nonce_field( 'tarw_save_widget', 'tarw_widget_nonce' );
 		$settings = $this->widget_settings( $post->ID );
+		$style    = wp_parse_args( is_array( $settings['style'] ) ? $settings['style'] : array(), Widget_Display::style_defaults() );
 		$sources  = get_posts(
 			array(
 				'post_type'      => 'tarw_source',
@@ -250,6 +252,11 @@ final class Admin {
 						<option value="<?php echo esc_attr( $source->ID ); ?>" <?php selected( $settings['source_id'], $source->ID ); ?>><?php echo esc_html( $source->post_title ); ?></option>
 					<?php endforeach; ?>
 				</select>
+			</p>
+			<p>
+				<label for="tarw-public-heading"><strong><?php esc_html_e( 'Public heading', 'tomawesome-review-widgets' ); ?></strong></label>
+				<input class="widefat" id="tarw-public-heading" name="tarw_widget[public_heading]" type="text" value="<?php echo esc_attr( $settings['public_heading'] ); ?>" maxlength="200" placeholder="<?php esc_attr_e( 'Uses the business name from Google when blank', 'tomawesome-review-widgets' ); ?>">
+				<span class="description"><?php esc_html_e( 'Optional. This appears in the business rating summary. The internal review-source title is never shown publicly.', 'tomawesome-review-widgets' ); ?></span>
 			</p>
 			<p>
 				<label for="tarw-layout"><strong><?php esc_html_e( 'Layout', 'tomawesome-review-widgets' ); ?></strong></label>
@@ -328,15 +335,64 @@ final class Admin {
 				<label><input type="checkbox" name="tarw_widget[<?php echo esc_attr( $key ); ?>]" value="1" <?php checked( ! empty( $settings[ $key ] ) ); ?>> <?php echo esc_html( $label ); ?></label>
 			<?php endforeach; ?>
 		</div>
+		<p class="description"><?php esc_html_e( 'Google Places sources always display every available reviewer photo, name, and profile link plus an individual “View this review on Google Maps” link. These required attributions override the optional reviewer-photo setting.', 'tomawesome-review-widgets' ); ?></p>
 
 		<div class="tarw-privacy-panel">
 			<label><input id="tarw-privacy-mode" type="checkbox" name="tarw_widget[privacy_mode]" value="1" <?php checked( ! empty( $settings['privacy_mode'] ) ); ?>> <strong><?php esc_html_e( 'Healthcare Privacy Mode (HIPAA-conscious)', 'tomawesome-review-widgets' ); ?></strong></label>
 			<p><?php esc_html_e( 'Shows only reviews that an administrator has separately approved in the Review Library and supplied with privacy-reviewed display copy. It forcibly hides reviewer names, photos, profile links, exact dates, and owner responses. This is a technical safeguard—not legal advice, certification, or a guarantee of HIPAA compliance.', 'tomawesome-review-widgets' ); ?></p>
+			<p><strong><?php esc_html_e( 'Not available for Google Places sources:', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'Google Maps requires Places reviews to retain author attribution and individual source links. The plugin automatically turns this mode off when a Places source is selected.', 'tomawesome-review-widgets' ); ?></p>
+		</div>
+
+		<div class="tarw-style-panel">
+			<h3><?php esc_html_e( 'Basic styling', 'tomawesome-review-widgets' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Customize this widget without writing CSS. Leave any field blank to use the plugin or theme default.', 'tomawesome-review-widgets' ); ?></p>
+
+			<h4><?php esc_html_e( 'Colors', 'tomawesome-review-widgets' ); ?></h4>
+			<div class="tarw-admin-grid tarw-style-grid">
+				<?php
+				foreach ( array(
+					'widget_background' => __( 'Widget background', 'tomawesome-review-widgets' ),
+					'widget_text'       => __( 'Widget text', 'tomawesome-review-widgets' ),
+					'accent'            => __( 'Links and buttons', 'tomawesome-review-widgets' ),
+					'stars'             => __( 'Review stars', 'tomawesome-review-widgets' ),
+					'widget_border'     => __( 'Widget border', 'tomawesome-review-widgets' ),
+					'card_background'   => __( 'Review card background', 'tomawesome-review-widgets' ),
+					'card_border'       => __( 'Review card border', 'tomawesome-review-widgets' ),
+				) as $key => $label ) :
+					$field_id = 'tarw-style-' . str_replace( '_', '-', $key );
+					?>
+					<p>
+						<label for="<?php echo esc_attr( $field_id ); ?>"><strong><?php echo esc_html( $label ); ?></strong></label>
+						<input class="tarw-color-field" id="<?php echo esc_attr( $field_id ); ?>" name="tarw_widget[style][<?php echo esc_attr( $key ); ?>]" type="text" value="<?php echo esc_attr( $style[ $key ] ); ?>" data-default-color="">
+					</p>
+				<?php endforeach; ?>
+			</div>
+
+			<h4><?php esc_html_e( 'Spacing and borders', 'tomawesome-review-widgets' ); ?></h4>
+			<div class="tarw-admin-grid tarw-admin-grid-3 tarw-style-grid">
+				<?php
+				foreach ( array(
+					'widget_margin'        => array( __( 'Outer margin (top and bottom)', 'tomawesome-review-widgets' ), 300 ),
+					'widget_padding'       => array( __( 'Widget padding', 'tomawesome-review-widgets' ), 200 ),
+					'widget_border_width'  => array( __( 'Widget border width', 'tomawesome-review-widgets' ), 20 ),
+					'widget_border_radius' => array( __( 'Widget corner radius', 'tomawesome-review-widgets' ), 100 ),
+					'card_padding'         => array( __( 'Review card padding', 'tomawesome-review-widgets' ), 100 ),
+					'card_border_radius'   => array( __( 'Review card corner radius', 'tomawesome-review-widgets' ), 100 ),
+				) as $key => $field ) :
+					$field_id = 'tarw-style-' . str_replace( '_', '-', $key );
+					?>
+					<p>
+						<label for="<?php echo esc_attr( $field_id ); ?>"><strong><?php echo esc_html( $field[0] ); ?> (px)</strong></label>
+						<input id="<?php echo esc_attr( $field_id ); ?>" name="tarw_widget[style][<?php echo esc_attr( $key ); ?>]" type="number" min="0" max="<?php echo esc_attr( $field[1] ); ?>" step="1" value="<?php echo esc_attr( $style[ $key ] ); ?>" placeholder="<?php esc_attr_e( 'Default', 'tomawesome-review-widgets' ); ?>">
+					</p>
+				<?php endforeach; ?>
+			</div>
 		</div>
 
 		<p>
-			<label for="tarw-custom-class"><strong><?php esc_html_e( 'Custom CSS classes', 'tomawesome-review-widgets' ); ?></strong></label>
+			<label for="tarw-custom-class"><strong><?php esc_html_e( 'Custom CSS classes (advanced)', 'tomawesome-review-widgets' ); ?></strong></label>
 			<input class="widefat" id="tarw-custom-class" name="tarw_widget[custom_class]" type="text" value="<?php echo esc_attr( $settings['custom_class'] ); ?>">
+			<span class="description"><?php esc_html_e( 'Optional class names for CSS defined in your theme, child theme, or WordPress Additional CSS screen.', 'tomawesome-review-widgets' ); ?></span>
 		</p>
 		<?php
 	}
@@ -523,12 +579,14 @@ final class Admin {
 
 			<div id="tarw-places-setup" class="tarw-admin-card tarw-guide-card">
 				<h2><?php esc_html_e( 'Public Places: step-by-step setup', 'tomawesome-review-widgets' ); ?></h2>
+				<div class="notice notice-warning inline"><p><?php esc_html_e( 'Before publishing Places content, the website must provide publicly accessible Terms of Use and a Privacy Policy that incorporate Google’s Terms of Service and Privacy Policy. Places widgets must also keep the plugin’s Google Maps, author, provider, filter, and individual-review attributions visible.', 'tomawesome-review-widgets' ); ?></p></div>
 				<ol class="tarw-numbered-guide">
 					<li><h3><?php esc_html_e( 'Prepare Google Cloud', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Create or select a Google Cloud project, attach a billing account, then open APIs & Services > Library and enable Places API (New).', 'tomawesome-review-widgets' ); ?></p></li>
 					<li><h3><?php esc_html_e( 'Create and restrict an API key', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Open APIs & Services > Credentials, create an API key, and restrict its API access to Places API (New). Requests come from the WordPress server, so a browser HTTP-referrer restriction will not work. Use a server IP restriction only if your host provides a stable outbound IP.', 'tomawesome-review-widgets' ); ?></p></li>
 					<li><h3><?php esc_html_e( 'Save the key', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Open Google Connection, paste the key into Places API key, and save.', 'tomawesome-review-widgets' ); ?></p><p><a class="button" href="<?php echo esc_url( admin_url( 'edit.php?post_type=tarw_widget&page=tarw-settings' ) ); ?>"><?php esc_html_e( 'Open Google Connection', 'tomawesome-review-widgets' ); ?></a></p></li>
-					<li><h3><?php esc_html_e( 'Add and synchronize the source', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Find the business’s Place ID with Google’s Place ID tool. Then open Review Sources > Add New, choose Google Places, paste the Place ID, publish, and select Synchronize now.', 'tomawesome-review-widgets' ); ?></p><p><a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Find a Google Place ID', 'tomawesome-review-widgets' ); ?></a> · <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=tarw_source' ) ); ?>"><?php esc_html_e( 'Add a Review Source', 'tomawesome-review-widgets' ); ?></a></p></li>
+					<li><h3><?php esc_html_e( 'Add and synchronize the source', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Find the business’s Place ID with Google’s Place ID tool. Then open Review Sources > Add New, choose Google Places, paste the Place ID, publish, and select Synchronize now. Synchronize once after every plugin update that changes Places attribution handling.', 'tomawesome-review-widgets' ); ?></p><p><a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Find a Google Place ID', 'tomawesome-review-widgets' ); ?></a> · <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=tarw_source' ) ); ?>"><?php esc_html_e( 'Add a Review Source', 'tomawesome-review-widgets' ); ?></a></p></li>
 				</ol>
+				<p><a href="https://developers.google.com/maps/documentation/places/web-service/policies" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Review Google’s current Places policies and attribution requirements', 'tomawesome-review-widgets' ); ?></a></p>
 			</div>
 
 			<div class="tarw-admin-card">
@@ -557,21 +615,26 @@ final class Admin {
 		}
 		check_admin_referer( 'tarw_save_widget', 'tarw_widget_nonce' );
 
-		$input  = isset( $_POST['tarw_widget'] ) && is_array( $_POST['tarw_widget'] )
+		$input       = isset( $_POST['tarw_widget'] ) && is_array( $_POST['tarw_widget'] )
 			? map_deep( wp_unslash( $_POST['tarw_widget'] ), 'sanitize_text_field' )
 			: array();
-		$layout = in_array( $input['layout'] ?? '', array( 'grid', 'list', 'carousel', 'featured' ), true ) ? $input['layout'] : 'grid';
-		$sort   = in_array( $input['sort'] ?? '', array( 'newest', 'oldest', 'highest', 'random' ), true ) ? $input['sort'] : 'newest';
+		$layout      = in_array( $input['layout'] ?? '', array( 'grid', 'list', 'carousel', 'featured' ), true ) ? $input['layout'] : 'grid';
+		$sort        = in_array( $input['sort'] ?? '', array( 'newest', 'oldest', 'highest', 'random' ), true ) ? $input['sort'] : 'newest';
+		$style_input = isset( $input['style'] ) && is_array( $input['style'] ) ? $input['style'] : array();
+
+		$source_id = absint( $input['source_id'] ?? 0 );
+		$is_places = $source_id && 'places' === get_post_meta( $source_id, '_tarw_source_type', true );
 
 		$settings = array(
-			'source_id'       => absint( $input['source_id'] ?? 0 ),
+			'source_id'       => $source_id,
+			'public_heading'  => substr( sanitize_text_field( $input['public_heading'] ?? '' ), 0, 200 ),
 			'layout'          => $layout,
 			'limit'           => min( 50, max( 1, absint( $input['limit'] ?? 6 ) ) ),
 			'min_rating'      => min( 5, max( 1, absint( $input['min_rating'] ?? 1 ) ) ),
 			'sort'            => $sort,
 			'text_only'       => empty( $input['text_only'] ) ? 0 : 1,
 			'max_chars'       => min( 2000, absint( $input['max_chars'] ?? 320 ) ),
-			'show_avatar'     => empty( $input['show_avatar'] ) ? 0 : 1,
+			'show_avatar'     => ( $is_places || ! empty( $input['show_avatar'] ) ) ? 1 : 0,
 			'show_date'       => empty( $input['show_date'] ) ? 0 : 1,
 			'show_summary'    => empty( $input['show_summary'] ) ? 0 : 1,
 			'show_read_all'   => empty( $input['show_read_all'] ) ? 0 : 1,
@@ -579,11 +642,40 @@ final class Admin {
 			'columns_desktop' => min( 4, max( 1, absint( $input['columns_desktop'] ?? 3 ) ) ),
 			'columns_tablet'  => min( 3, max( 1, absint( $input['columns_tablet'] ?? 2 ) ) ),
 			'columns_mobile'  => min( 2, max( 1, absint( $input['columns_mobile'] ?? 1 ) ) ),
-			'privacy_mode'    => empty( $input['privacy_mode'] ) ? 0 : 1,
+			'privacy_mode'    => ! $is_places && ! empty( $input['privacy_mode'] ) ? 1 : 0,
+			'style'           => $this->sanitize_widget_style( $style_input ),
 			'custom_class'    => implode( ' ', array_filter( array_map( 'sanitize_html_class', preg_split( '/\s+/', (string) ( $input['custom_class'] ?? '' ) ) ) ) ),
 		);
 
 		update_post_meta( $post_id, '_tarw_widget_settings', $settings );
+	}
+
+	/**
+	 * Sanitizes the optional visual-style controls saved with a widget.
+	 *
+	 * @param array<string,mixed> $input Submitted style fields.
+	 * @return array<string,string>
+	 */
+	private function sanitize_widget_style( array $input ) {
+		$style = Widget_Display::style_defaults();
+		foreach ( array( 'widget_background', 'widget_text', 'accent', 'stars', 'widget_border', 'card_background', 'card_border' ) as $key ) {
+			$color         = sanitize_hex_color( $input[ $key ] ?? '' );
+			$style[ $key ] = is_string( $color ) ? $color : '';
+		}
+
+		foreach ( array(
+			'widget_margin'        => 300,
+			'widget_padding'       => 200,
+			'widget_border_width'  => 20,
+			'widget_border_radius' => 100,
+			'card_padding'         => 100,
+			'card_border_radius'   => 100,
+		) as $key => $maximum ) {
+			$value         = trim( (string) ( $input[ $key ] ?? '' ) );
+			$style[ $key ] = preg_match( '/^\d+$/', $value ) ? (string) min( $maximum, absint( $value ) ) : '';
+		}
+
+		return $style;
 	}
 
 	/**
@@ -661,7 +753,7 @@ final class Admin {
 			</div>
 
 			<?php if ( is_wp_error( $locations ) ) : ?>
-				<div class="notice notice-error inline"><p><?php echo esc_html( $locations->get_error_message() ); ?></p></div>
+				<?php $this->render_business_profile_error( $locations ); ?>
 			<?php elseif ( $discover ) : ?>
 				<?php $this->render_locations( $locations ); ?>
 			<?php endif; ?>
@@ -677,6 +769,52 @@ final class Admin {
 				</ol>
 				<p><a href="https://developers.google.com/my-business/content/prereqs" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Google Business Profile API prerequisites', 'tomawesome-review-widgets' ); ?></a> · <a href="https://developers.google.com/my-business/content/policies" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Google Business Profile API policies', 'tomawesome-review-widgets' ); ?></a></p>
 			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Renders actionable help for Business Profile API failures.
+	 *
+	 * @param \WP_Error $error Google Business Profile error.
+	 * @return void
+	 */
+	private function render_business_profile_error( \WP_Error $error ) {
+		if ( 'tarw_business_profile_quota_exceeded' !== $error->get_error_code() ) {
+			?>
+			<div class="notice notice-error inline"><p><?php echo esc_html( $error->get_error_message() ); ?></p></div>
+			<?php
+			return;
+		}
+
+		$data              = $error->get_error_data();
+		$data              = is_array( $data ) ? $data : array();
+		$technical_message = sanitize_text_field( $data['google_message'] ?? '' );
+		$zero_quota        = isset( $data['quota_limit_value'] ) && '0' === (string) $data['quota_limit_value'];
+		?>
+		<div class="notice notice-error inline tarw-api-help">
+			<?php if ( $zero_quota ) : ?>
+				<p><strong><?php esc_html_e( 'Google has not granted Business Profile API access to this project', 'tomawesome-review-widgets' ); ?></strong></p>
+				<p><?php esc_html_e( 'Google reports that this project’s Requests per minute limit is 0. Enabling the API and completing OAuth setup are separate from receiving Business Profile Basic API Access.', 'tomawesome-review-widgets' ); ?></p>
+			<?php else : ?>
+				<p><strong><?php esc_html_e( 'Google Business Profile API quota is unavailable', 'tomawesome-review-widgets' ); ?></strong></p>
+				<p><?php esc_html_e( 'Google refused the managed-location request because the Account Management API quota is zero or temporarily exhausted. For a newly configured project, the usual cause is a Requests per minute limit of 0 because Google has not yet granted Basic API Access.', 'tomawesome-review-widgets' ); ?></p>
+			<?php endif; ?>
+			<ol>
+				<li><?php esc_html_e( 'Open the Account Management API quota page in the same Google Cloud project used for these OAuth credentials and find Requests per minute.', 'tomawesome-review-widgets' ); ?></li>
+				<li><?php esc_html_e( 'If the limit is 0, submit Google’s Basic API Access application and wait for approval. Enabling the API and completing OAuth setup do not grant this access by themselves.', 'tomawesome-review-widgets' ); ?></li>
+				<li><?php esc_html_e( 'If the limit is above 0, wait at least one minute and try Discover managed locations again. If the error continues, confirm that the approved project and the OAuth client project are the same.', 'tomawesome-review-widgets' ); ?></li>
+			</ol>
+			<p>
+				<a class="button button-primary" href="https://console.cloud.google.com/apis/api/mybusinessaccountmanagement.googleapis.com/quotas" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Check API quota in Google Cloud', 'tomawesome-review-widgets' ); ?></a>
+				<a class="button" href="https://support.google.com/business/contact/api_default" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Apply for Basic API Access', 'tomawesome-review-widgets' ); ?></a>
+			</p>
+			<?php if ( '' !== $technical_message ) : ?>
+				<details>
+					<summary><?php esc_html_e( 'Google technical details', 'tomawesome-review-widgets' ); ?></summary>
+					<p><code><?php echo esc_html( $technical_message ); ?></code></p>
+				</details>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -939,6 +1077,7 @@ final class Admin {
 		update_post_meta( $source_id, '_tarw_source_type', 'business_profile' );
 		update_post_meta( $source_id, '_tarw_account_name', $account );
 		update_post_meta( $source_id, '_tarw_location_name', $location );
+		update_post_meta( $source_id, '_tarw_business_name', $title );
 		update_post_meta( $source_id, '_tarw_review_url', esc_url_raw( wp_unslash( $_POST['review_url'] ?? '' ) ) );
 		update_post_meta( $source_id, '_tarw_leave_review_url', esc_url_raw( wp_unslash( $_POST['leave_review_url'] ?? '' ) ) );
 		update_post_meta( $source_id, '_tarw_enabled', 1 );
@@ -1109,6 +1248,7 @@ final class Admin {
 			is_array( $stored ) ? $stored : array(),
 			array(
 				'source_id'       => 0,
+				'public_heading'  => '',
 				'layout'          => 'grid',
 				'limit'           => 6,
 				'min_rating'      => 4,
@@ -1124,6 +1264,7 @@ final class Admin {
 				'columns_tablet'  => 2,
 				'columns_mobile'  => 1,
 				'privacy_mode'    => 0,
+				'style'           => array(),
 				'custom_class'    => '',
 			)
 		);

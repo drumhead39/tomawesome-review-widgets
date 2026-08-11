@@ -54,7 +54,7 @@ final class Places_Client {
 				'headers' => array(
 					'Accept'           => 'application/json',
 					'X-Goog-Api-Key'   => $api_key,
-					'X-Goog-FieldMask' => 'id,displayName,rating,userRatingCount,reviews,googleMapsUri',
+					'X-Goog-FieldMask' => 'id,displayName,rating,userRatingCount,reviews,googleMapsUri,attributions',
 				),
 			)
 		);

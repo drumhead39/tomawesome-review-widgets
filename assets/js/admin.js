@@ -16,6 +16,10 @@
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {
+		if (window.jQuery && window.jQuery.fn.wpColorPicker) {
+			window.jQuery('.tarw-color-field').wpColorPicker();
+		}
+
 		var select = document.getElementById('tarw-source-type');
 		if (select) {
 			select.addEventListener('change', toggleSourceFields);

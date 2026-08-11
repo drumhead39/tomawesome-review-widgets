@@ -2,6 +2,7 @@
 /.github
 /tests
 /vendor
+/.phpunit.result.cache
 /.distignore
 /.gitattributes
 /.gitignore

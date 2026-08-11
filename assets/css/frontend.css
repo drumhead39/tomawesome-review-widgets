@@ -3,10 +3,15 @@
 	--tarw-border: #d9dde3;
 	--tarw-muted: #5f6368;
 	--tarw-star: #f9ab00;
+	background: var(--tarw-widget-background, transparent);
+	border: var(--tarw-widget-border-width, 0) solid var(--tarw-widget-border, transparent);
+	border-radius: var(--tarw-widget-border-radius, 0);
 	box-sizing: border-box;
-	color: inherit;
+	color: var(--tarw-widget-text, inherit);
 	font: inherit;
+	margin: var(--tarw-widget-margin, 0) 0;
 	max-width: 100%;
+	padding: var(--tarw-widget-padding, 0);
 }
 
 .tarw-widget *,
@@ -27,6 +32,13 @@
 	font-size: 1.2em;
 }
 
+.tarw-filter-notice {
+	color: var(--tarw-muted);
+	font-size: .82em;
+	line-height: 1.45;
+	margin: -.35rem 0 1rem;
+}
+
 .tarw-reviews {
 	display: grid;
 	gap: 1rem;
@@ -43,13 +55,13 @@
 }
 
 .tarw-review {
-	background: #fff;
-	border: 1px solid var(--tarw-border);
-	border-radius: .65rem;
+	background: var(--tarw-card-background, #fff);
+	border: 1px solid var(--tarw-card-border, var(--tarw-border));
+	border-radius: var(--tarw-card-border-radius, .65rem);
 	box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
 	margin: 0;
 	min-width: 0;
-	padding: 1.1rem;
+	padding: var(--tarw-card-padding, 1.1rem);
 }
 
 .tarw-review-header {
@@ -112,6 +124,7 @@
 
 .tarw-read-more:focus-visible,
 .tarw-carousel-controls button:focus-visible,
+.tarw-review-source a:focus-visible,
 .tarw-footer a:focus-visible {
 	outline: 3px solid rgba(26, 115, 232, .35);
 	outline: 3px solid color-mix(in srgb, var(--tarw-accent) 35%, transparent);
@@ -148,6 +161,44 @@
 
 .tarw-attribution {
 	font-weight: 700;
+}
+
+.tarw-google-maps-attribution {
+	background: #fff;
+	border: 1px solid #dadce0;
+	border-radius: 3px;
+	color: #5e5e5e;
+	display: inline-block;
+	font-family: Roboto, Arial, Sans-Serif;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 400;
+	letter-spacing: normal;
+	line-height: 1.35;
+	padding: 2px 5px;
+	white-space: nowrap;
+}
+
+.tarw-provider-attributions {
+	color: var(--tarw-muted);
+	display: inline;
+	font-size: 12px;
+	font-weight: 400;
+	margin-left: .5rem;
+}
+
+.tarw-review-source {
+	font-size: .85em;
+	margin: .8rem 0 0;
+}
+
+.tarw-review-source a,
+.tarw-provider-attributions a {
+	color: var(--tarw-accent);
+}
+
+.tarw-footer a {
+	color: var(--tarw-accent);
 }
 
 .tarw-actions {
