@@ -2,7 +2,7 @@
 
 TomAwesome Review Widgets is a self-hosted WordPress plugin for creating unlimited review shortcodes from multiple Google Business Profile and Places sources.
 
-> Status: 0.2.4 developer preview. The code is structurally complete, but a real approved Google Business Profile project and WordPress staging site are still required for integration and Plugin Check testing before a 1.0.0 release.
+> Status: 0.2.5 developer preview. The code is structurally complete, but a real approved Google Business Profile project and WordPress staging site are still required for integration and Plugin Check testing before a 1.0.0 release.
 
 ## Highlights
 
@@ -30,6 +30,8 @@ TomAwesome Review Widgets is a self-hosted WordPress plugin for creating unlimit
 5. Publish a widget and embed `[tomawesome_reviews id="123"]`.
 
 Read [`docs/HEALTHCARE-PRIVACY-MODE.md`](docs/HEALTHCARE-PRIVACY-MODE.md) before enabling privacy mode. It is a technical safeguard, not a HIPAA certification or legal advice.
+
+Read [`docs/PLACES-COMPLIANCE.md`](docs/PLACES-COMPLIANCE.md) before publishing a Places source. It explains every Places-only public element, where it is enforced, and what disappears automatically after a widget switches to a managed Business Profile source.
 
 ## Development
 

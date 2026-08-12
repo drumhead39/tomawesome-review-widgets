@@ -2,6 +2,14 @@
 
 All notable changes to TomAwesome Review Widgets are documented here.
 
+## 0.2.5 — 2026-08-12
+
+- Shortened the Places review-selection notice and moved it into the footer beside the Google Maps attribution.
+- Improved the notice grammar for five-star-only widgets and preserved dynamic descriptions for count, rating, written-text, and order filters.
+- Added a dedicated Places compliance guide covering every enforced public element and its policy basis.
+- Added administrator guidance explaining why Places-only elements appear and how they disappear automatically when a widget switches to a managed Business Profile source.
+- Expanded the packaged installation guide, WordPress readme, and architecture notes with the Places-to-managed-source transition.
+
 ## 0.2.4 — 2026-08-11
 
 - Updated Places widgets for Google Maps' August 2026 attribution requirements.

@@ -9,6 +9,18 @@
 5. The `[tomawesome_reviews id="..."]` shortcode queries only unexpired rows and renders escaped HTML.
 6. The front end makes no review API request. Places widgets request available Google-hosted reviewer images as required author attribution; Business Profile widgets request them only when the administrator enables avatars.
 
+## Places policy boundary
+
+The selected source type controls the public compliance presentation at render time. `Shortcode::widget_markup()` identifies a Places source and then enforces the Places-only presentation without relying on an optional widget setting:
+
+- `Widget_Display::privacy_mode()` disables the author-suppressing privacy presentation.
+- `Widget_Display::show_reviewer_photo()` keeps available author photos visible.
+- `Shortcode::review_markup()` adds an individual Google Maps link to each review.
+- `Shortcode::footer_markup()` adds Google Maps attribution, returned provider credit, and the dynamic selection/filter notice.
+- `Widget_Display::places_filter_notice()` describes Google's relevance-selected sample plus the widget's active count, rating, written-text, and order filters.
+
+When the widget is changed to a managed Business Profile source, the same source-type check stops rendering these Places-only elements automatically. See `docs/PLACES-COMPLIANCE.md` for the site-owner explanation and policy checklist.
+
 ## WordPress storage
 
 - `tarw_source` private custom post type: business/location identifiers, public links, synchronization status, aggregate rating, Places provider attributions, and the Places policy-sync marker.

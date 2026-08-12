@@ -151,10 +151,47 @@ final class WidgetDisplayTest extends TestCase {
 			)
 		);
 
-		$this->assertStringContainsString( 'selected by relevance', $notice );
-		$this->assertStringContainsString( 'up to 5 reviews', $notice );
+		$this->assertStringContainsString( 'selects up to five reviews by relevance', $notice );
+		$this->assertStringContainsString( 'written reviews rated 4 stars or higher', $notice );
 		$this->assertStringContainsString( '4 stars or higher', $notice );
 		$this->assertStringContainsString( 'highest rated first', $notice );
-		$this->assertStringContainsString( 'Written text is required', $notice );
+	}
+
+	/**
+	 * The common five-review, written five-star notice stays concise.
+	 *
+	 * @return void
+	 */
+	public function test_places_filter_notice_is_concise_for_common_settings() {
+		$this->assertSame(
+			'Google selects up to five reviews by relevance; this widget shows written 5-star reviews, newest first.',
+			Widget_Display::places_filter_notice(
+				array(
+					'limit'      => 5,
+					'min_rating' => 5,
+					'sort'       => 'newest',
+					'text_only'  => 1,
+				)
+			)
+		);
+	}
+
+	/**
+	 * A display limit below Google's sample size remains disclosed.
+	 *
+	 * @return void
+	 */
+	public function test_places_filter_notice_includes_smaller_display_limit() {
+		$this->assertSame(
+			'Google selects up to five reviews by relevance; this widget shows up to 3 reviews rated 2 stars or higher, oldest first.',
+			Widget_Display::places_filter_notice(
+				array(
+					'limit'      => 3,
+					'min_rating' => 2,
+					'sort'       => 'oldest',
+					'text_only'  => 0,
+				)
+			)
+		);
 	}
 }

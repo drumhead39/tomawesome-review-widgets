@@ -146,7 +146,7 @@ This is self-hosted open-source software: each site operator independently owns 
 
 Places mode works without managing the business, but Google currently supplies at most five reviews selected by relevance.
 
-Before publishing Places content, make sure the website provides publicly accessible Terms of Use and a Privacy Policy that incorporate [Google's Terms of Service](https://policies.google.com/terms) and [Google's Privacy Policy](https://policies.google.com/privacy). Do not hide or remove the widget's Google Maps attribution, returned provider attribution, author information, individual-review links, or review-selection/filter notice. Review [Google's current Places policies and attribution requirements](https://developers.google.com/maps/documentation/places/web-service/policies).
+Before publishing Places content, make sure the website provides publicly accessible Terms of Use and a Privacy Policy that incorporate [Google's Terms of Service](https://policies.google.com/terms) and [Google's Privacy Policy](https://policies.google.com/privacy). Do not hide or remove the widget's Google Maps attribution, returned provider attribution, author information, individual-review links, or review-selection/filter notice. Review [Google's current Places policies and attribution requirements](https://developers.google.com/maps/documentation/places/web-service/policies) and the packaged [`PLACES-COMPLIANCE.md`](PLACES-COMPLIANCE.md) guide.
 
 1. In Google Cloud, create or choose a project with billing configured.
 2. Enable **Places API (New)**.
@@ -160,6 +160,19 @@ Before publishing Places content, make sure the website provides publicly access
 After installing version 0.2.4 or any future update that changes Places attribution handling, synchronize every Places source once. Until that succeeds, the plugin hides its Places widget from visitors and shows administrators a synchronization reminder. This prevents older cached records from being displayed without newly required fields.
 
 Never put the Places API key in a page, shortcode, theme file, or client-side JavaScript. This plugin sends it only in server-side requests.
+
+### Why Places widgets display extra public information
+
+Google's Places policies require a clear review-selection/filter notice in addition to Google Maps attribution, available author attribution, returned data-provider credit, and direct access to each individual source review. Version 0.2.5 places the concise notice beside the Google Maps attribution in the widget footer. Its wording updates automatically when the widget's review count, minimum rating, written-text requirement, or ordering changes.
+
+These are Places-only elements. After Business Profile API access is approved:
+
+1. Connect Google Business Profile under **Review Widgets > Google Connection**.
+2. Discover, import, and synchronize the managed location as a new source. Do not convert the existing Places source.
+3. Edit the widget and select the new managed Business Profile source.
+4. Update the widget.
+
+On the next page load, the plugin automatically removes the Places selection notice, Google Maps Places attribution, returned provider credit, and individual Places-review links. The managed source can retrieve the complete review list, makes reviewer photos optional, and allows Healthcare Privacy Mode.
 
 ## 3. Create a widget
 

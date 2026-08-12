@@ -3,7 +3,7 @@ Contributors: tomawesome
 Tags: reviews, google reviews, testimonials, business profile, healthcare
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 0.2.4
+Stable tag: 0.2.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -71,6 +71,14 @@ For Places sources, available reviewer photos and profile links are required att
 
 Sites that publish Places API content must maintain publicly accessible Terms of Use and a Privacy Policy that incorporate Google's Terms of Service and Privacy Policy. Places widgets display Google Maps attribution, all available author attribution, returned data-provider attribution, individual review links, and a description of review selection and filtering.
 
+= Why Places widgets contain extra public information =
+
+Google's current Places policies require sites displaying Places reviews to identify Google Maps as the content source, credit authors and returned data providers, give visitors direct access to each source review, and clearly explain how the reviews are selected, filtered, and ordered. The plugin enforces these elements only when a widget uses a Google Places source. They are not advertising and should not be hidden with CSS or removed by a theme override.
+
+The selection/filter notice is placed beside the Google Maps attribution in the widget footer and updates automatically with the widget settings. For example: “Google selects up to five reviews by relevance; this widget shows written 5-star reviews, newest first.”
+
+After Business Profile API access is approved, import and synchronize the managed location as a new Review Source, then edit the widget and select that managed source. The Places selection notice, Google Maps Places attribution, returned provider credit, and individual Places-review links disappear automatically. Managed sources can retrieve the complete review list, make reviewer photos optional, and allow Healthcare Privacy Mode.
+
 Google terms and policies: https://policies.google.com/terms
 
 Google privacy policy: https://policies.google.com/privacy
@@ -89,7 +97,7 @@ TomAwesome Review Widgets is not affiliated with, sponsored by, or endorsed by G
 4. Choose a connection method:
    * For complete reviews from managed businesses, configure an approved Google Business Profile API project and OAuth Web application.
    * For a public Place, configure a Places API (New) key. Google returns up to five selected reviews.
-5. Add or import at least one Review Source and use Synchronize now. After updating to 0.2.4, synchronize each Places source once to retrieve the current attribution fields and individual review links.
+5. Add or import at least one Review Source and use Synchronize now. After updating from a version earlier than 0.2.4, synchronize each Places source once to retrieve the current attribution fields and individual review links.
 6. Go to Review Widgets > Add New, name and configure the widget, then publish it.
 7. Copy the generated shortcode into a page, post, or page-builder shortcode element.
 
@@ -108,6 +116,16 @@ Yes. One connected Google account can import multiple managed Business Profile l
 = Why does Places mode show only a few reviews? =
 
 The Places API currently returns at most five reviews selected by Google. Use the Business Profile connection for a complete review list from a business you manage.
+
+= Why does my Places widget show a review-selection notice and extra Google Maps links? =
+
+Google's Places policies require a clear description of review selection, filtering, and ordering, along with Google Maps attribution, available author attribution, returned provider credit, and direct access to each individual source review. The plugin places the concise notice beside the Google Maps attribution in the footer and updates it when the widget's count, minimum rating, written-text requirement, or order changes.
+
+These elements are tied to the selected source type and are not optional styling controls. Do not hide them with Custom CSS. Open Review Widgets > Getting Started > Public Places for the full explanation and current policy link.
+
+= What happens when I switch a widget to a managed Business Profile source? =
+
+First import and synchronize the managed location as a new source; do not convert the existing Places source. Edit the widget, select the new managed Business Profile source, and update it. The Places selection notice, Places-specific Google Maps attribution, returned provider credit, and individual Places-review links disappear automatically on the next page load. Reviewer photos become optional, Healthcare Privacy Mode becomes available, and the managed source can retrieve the complete paginated review list.
 
 = Can Healthcare Privacy Mode be used with a Places source? =
 
@@ -134,6 +152,13 @@ No more than 30 days. Successful synchronizations renew the local performance ca
 By default, saved configuration and content remain to prevent accidental data loss. Enable “Delete plugin settings...” under Review Widgets > Google Connection before uninstalling if you want all plugin data removed.
 
 == Changelog ==
+
+= 0.2.5 =
+
+* Shortened the Places review-selection notice and moved it beside the Google Maps attribution in the widget footer.
+* Kept the notice synchronized with the active count, rating, written-text, and order filters.
+* Added built-in and packaged documentation explaining every Places-only compliance element.
+* Documented how Places-specific elements disappear automatically when a widget switches to a managed Business Profile source.
 
 = 0.2.4 =
 
@@ -185,6 +210,10 @@ By default, saved configuration and content remain to prevent accidental data lo
 * Added responsive, accessible front-end rendering and reduced-motion support.
 
 == Upgrade Notice ==
+
+= 0.2.5 =
+
+Places widgets now use a shorter footer notice. No source synchronization or widget reconfiguration is required.
 
 = 0.2.4 =
 

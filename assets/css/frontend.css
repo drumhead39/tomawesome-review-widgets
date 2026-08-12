@@ -34,9 +34,9 @@
 
 .tarw-filter-notice {
 	color: var(--tarw-muted);
-	font-size: .82em;
-	line-height: 1.45;
-	margin: -.35rem 0 1rem;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.4;
 }
 
 .tarw-reviews {
@@ -157,6 +157,15 @@
 	gap: .75rem 1.25rem;
 	justify-content: space-between;
 	margin-top: 1rem;
+}
+
+.tarw-compliance {
+	align-items: center;
+	display: flex;
+	flex: 1 1 28rem;
+	flex-wrap: wrap;
+	gap: .4rem .75rem;
+	min-width: 0;
 }
 
 .tarw-attribution {

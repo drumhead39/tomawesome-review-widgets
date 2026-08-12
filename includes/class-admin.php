@@ -336,6 +336,7 @@ final class Admin {
 			<?php endforeach; ?>
 		</div>
 		<p class="description"><?php esc_html_e( 'Google Places sources always display every available reviewer photo, name, and profile link plus an individual “View this review on Google Maps” link. These required attributions override the optional reviewer-photo setting.', 'tomawesome-review-widgets' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Places widgets also show a short selection/filter notice beside the Google Maps attribution in the footer. The notice and other Places-only compliance elements disappear automatically when this widget uses a managed Business Profile source.', 'tomawesome-review-widgets' ); ?></p>
 
 		<div class="tarw-privacy-panel">
 			<label><input id="tarw-privacy-mode" type="checkbox" name="tarw_widget[privacy_mode]" value="1" <?php checked( ! empty( $settings['privacy_mode'] ) ); ?>> <strong><?php esc_html_e( 'Healthcare Privacy Mode (HIPAA-conscious)', 'tomawesome-review-widgets' ); ?></strong></label>
@@ -438,6 +439,10 @@ final class Admin {
 		</div>
 		<div class="tarw-source-places">
 			<p><label for="tarw-place-id"><strong><?php esc_html_e( 'Google Place ID', 'tomawesome-review-widgets' ); ?></strong></label><input class="widefat" id="tarw-place-id" name="tarw_source[place_id]" type="text" value="<?php echo esc_attr( get_post_meta( $post->ID, '_tarw_place_id', true ) ); ?>" placeholder="ChIJ..."></p>
+			<p class="description">
+				<?php esc_html_e( 'Places widgets include Google Maps attribution, author details, individual-review links, returned provider credits, and a selection/filter notice required for Places content. These Places-only elements disappear automatically when a widget is changed to a managed Business Profile source.', 'tomawesome-review-widgets' ); ?>
+				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=tarw_widget&page=tarw-getting-started#tarw-places-compliance' ) ); ?>"><?php esc_html_e( 'Why these elements appear', 'tomawesome-review-widgets' ); ?></a>
+			</p>
 		</div>
 		<p><label for="tarw-review-url"><strong><?php esc_html_e( 'Read all reviews URL', 'tomawesome-review-widgets' ); ?></strong></label><input class="widefat" id="tarw-review-url" name="tarw_source[review_url]" type="url" value="<?php echo esc_attr( get_post_meta( $post->ID, '_tarw_review_url', true ) ); ?>"></p>
 		<p><label for="tarw-leave-url"><strong><?php esc_html_e( 'Leave a review URL', 'tomawesome-review-widgets' ); ?></strong></label><input class="widefat" id="tarw-leave-url" name="tarw_source[leave_review_url]" type="url" value="<?php echo esc_attr( get_post_meta( $post->ID, '_tarw_leave_review_url', true ) ); ?>"></p>
@@ -586,6 +591,21 @@ final class Admin {
 					<li><h3><?php esc_html_e( 'Save the key', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Open Google Connection, paste the key into Places API key, and save.', 'tomawesome-review-widgets' ); ?></p><p><a class="button" href="<?php echo esc_url( admin_url( 'edit.php?post_type=tarw_widget&page=tarw-settings' ) ); ?>"><?php esc_html_e( 'Open Google Connection', 'tomawesome-review-widgets' ); ?></a></p></li>
 					<li><h3><?php esc_html_e( 'Add and synchronize the source', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Find the business’s Place ID with Google’s Place ID tool. Then open Review Sources > Add New, choose Google Places, paste the Place ID, publish, and select Synchronize now. Synchronize once after every plugin update that changes Places attribution handling.', 'tomawesome-review-widgets' ); ?></p><p><a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Find a Google Place ID', 'tomawesome-review-widgets' ); ?></a> · <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=tarw_source' ) ); ?>"><?php esc_html_e( 'Add a Review Source', 'tomawesome-review-widgets' ); ?></a></p></li>
 				</ol>
+
+				<div id="tarw-places-compliance">
+					<h3><?php esc_html_e( 'Why Places widgets show extra attribution and a selection notice', 'tomawesome-review-widgets' ); ?></h3>
+					<p><?php esc_html_e( 'These elements are not promotional text added by the plugin. They exist because Google’s Places policies require sites that republish Places reviews to identify the source, credit review authors and returned data providers, provide direct access to each source review, and clearly describe how reviews are selected, filtered, and ordered.', 'tomawesome-review-widgets' ); ?></p>
+					<ul>
+						<li><?php esc_html_e( 'Google Maps attribution identifies the provider of the Places content.', 'tomawesome-review-widgets' ); ?></li>
+						<li><?php esc_html_e( 'Available reviewer names, profile links, and photos credit each author.', 'tomawesome-review-widgets' ); ?></li>
+						<li><?php esc_html_e( 'The link on each card opens that individual review on Google Maps.', 'tomawesome-review-widgets' ); ?></li>
+						<li><?php esc_html_e( 'Any data-provider credit returned by Google is displayed beside the Google Maps attribution.', 'tomawesome-review-widgets' ); ?></li>
+						<li><?php esc_html_e( 'The footer notice explains Google’s relevance-selected sample and the widget’s active count, rating, written-text, and order filters.', 'tomawesome-review-widgets' ); ?></li>
+					</ul>
+
+					<h3><?php esc_html_e( 'What changes after switching to a managed Business Profile source', 'tomawesome-review-widgets' ); ?></h3>
+					<p><?php esc_html_e( 'Do not convert the existing Places source. After Google approves your Business Profile API project, connect Google Business Profile, discover and synchronize the managed location, then edit each widget and select that new managed source. On the next page load, the plugin automatically removes the Places selection notice, Google Maps Places attribution, returned provider credit, and individual Places-review links. Managed sources can retrieve the complete review list, make reviewer photos optional, and allow Healthcare Privacy Mode.', 'tomawesome-review-widgets' ); ?></p>
+				</div>
 				<p><a href="https://developers.google.com/maps/documentation/places/web-service/policies" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Review Google’s current Places policies and attribution requirements', 'tomawesome-review-widgets' ); ?></a></p>
 			</div>
 

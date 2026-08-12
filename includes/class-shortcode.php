@@ -176,10 +176,6 @@ final class Shortcode {
 			<?php if ( ! empty( $settings['show_summary'] ) ) : ?>
 				<?php echo $this->summary_markup( $source_id, $business_name ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?php endif; ?>
-			<?php if ( $is_places ) : ?>
-				<p class="tarw-filter-notice"><?php echo esc_html( Widget_Display::places_filter_notice( $settings ) ); ?></p>
-			<?php endif; ?>
-
 			<div class="tarw-reviews"<?php echo 'carousel' === $layout ? ' role="region" aria-roledescription="carousel"' : ''; ?>>
 				<?php foreach ( $reviews as $review ) : ?>
 					<?php echo $this->review_markup( $review, $settings, $privacy_mode, $is_places ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -332,12 +328,17 @@ final class Shortcode {
 		ob_start();
 		?>
 		<footer class="tarw-footer">
-			<span class="tarw-attribution">
+			<span class="tarw-compliance">
+				<span class="tarw-attribution">
+					<?php if ( $is_places ) : ?>
+						<span class="tarw-google-maps-attribution" translate="no" aria-label="Google Maps">Google Maps</span>
+						<?php echo $this->places_provider_attributions( $source_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php else : ?>
+						<?php esc_html_e( 'Reviews from Google', 'tomawesome-review-widgets' ); ?>
+					<?php endif; ?>
+				</span>
 				<?php if ( $is_places ) : ?>
-					<span class="tarw-google-maps-attribution" translate="no" aria-label="Google Maps">Google Maps</span>
-					<?php echo $this->places_provider_attributions( $source_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<?php else : ?>
-					<?php esc_html_e( 'Reviews from Google', 'tomawesome-review-widgets' ); ?>
+					<span class="tarw-filter-notice"><?php echo esc_html( Widget_Display::places_filter_notice( $settings ) ); ?></span>
 				<?php endif; ?>
 			</span>
 			<?php if ( ! $privacy_mode ) : ?>

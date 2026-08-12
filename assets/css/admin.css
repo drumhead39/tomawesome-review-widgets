@@ -85,6 +85,13 @@
 	scroll-margin-top: 40px;
 }
 
+#tarw-places-compliance {
+	border-top: 1px solid #dcdcde;
+	margin-top: 1rem;
+	padding-top: .5rem;
+	scroll-margin-top: 40px;
+}
+
 .tarw-guide-card > h2 {
 	font-size: 1.45rem;
 }

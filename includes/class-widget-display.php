@@ -58,20 +58,27 @@ final class Widget_Display {
 			'random'  => __( 'in random order', 'tomawesome-review-widgets' ),
 		);
 		$sort       = $order[ (string) ( $settings['sort'] ?? '' ) ] ?? $order['newest'];
-		$text_rule  = ! empty( $settings['text_only'] )
-			? __( ' Written text is required.', 'tomawesome-review-widgets' )
+
+		$count = 5 > $limit
+			/* translators: %d: Maximum number of reviews displayed by this widget. */
+			? sprintf( __( 'up to %d ', 'tomawesome-review-widgets' ), $limit )
 			: '';
+		$text = ! empty( $settings['text_only'] ) ? __( 'written ', 'tomawesome-review-widgets' ) : '';
 
-		/* translators: 1: Maximum displayed reviews. 2: Minimum star rating. 3: Sort description. 4: Optional written-text filter sentence. */
-		$format = __( 'Google Maps supplies up to five reviews selected by relevance. This widget displays up to %1$d reviews rated %2$d stars or higher, ordered %3$s.%4$s', 'tomawesome-review-widgets' );
+		if ( 5 === $min_rating ) {
+			$rating = __( '5-star reviews', 'tomawesome-review-widgets' );
+		} elseif ( 1 === $min_rating ) {
+			/* translators: %d: Minimum star rating. */
+			$rating = sprintf( __( 'reviews rated %d star or higher', 'tomawesome-review-widgets' ), $min_rating );
+		} else {
+			/* translators: %d: Minimum star rating. */
+			$rating = sprintf( __( 'reviews rated %d stars or higher', 'tomawesome-review-widgets' ), $min_rating );
+		}
 
-		return sprintf(
-			$format,
-			$limit,
-			$min_rating,
-			$sort,
-			$text_rule
-		);
+		/* translators: 1: Optional display limit and written-text qualifier plus rating filter. 2: Sort description. */
+		$format = __( 'Google selects up to five reviews by relevance; this widget shows %1$s, %2$s.', 'tomawesome-review-widgets' );
+
+		return sprintf( $format, $count . $text . $rating, $sort );
 	}
 
 	/**
