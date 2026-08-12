@@ -174,14 +174,102 @@ final class Business_Profile_Client {
 		$status = wp_remote_retrieve_response_code( $response );
 		$data   = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( $status < 200 || $status >= 300 || ! is_array( $data ) ) {
-			$message = is_array( $data ) && ! empty( $data['error']['message'] )
-				? sanitize_text_field( $data['error']['message'] )
-				/* translators: %d: HTTP status code returned by Google Business Profile. */
-				: sprintf( __( 'Google Business Profile returned HTTP %d.', 'tomawesome-review-widgets' ), $status );
-			return new \WP_Error( 'tarw_business_profile_api_error', $message, array( 'status' => $status ) );
+			return self::error_from_response( $status, is_array( $data ) ? $data : array() );
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Converts a Google API error response into a structured WordPress error.
+	 *
+	 * Quota failures need a distinct error code because a newly configured
+	 * Business Profile project often has a zero quota until Google grants Basic
+	 * API Access. The administrator screen uses the structured data to show
+	 * actionable help while preserving Google's technical response.
+	 *
+	 * @param int                 $status HTTP status code.
+	 * @param array<string,mixed> $data Decoded Google response body.
+	 * @return \WP_Error
+	 */
+	public static function error_from_response( $status, array $data ) {
+		$google_error  = isset( $data['error'] ) && is_array( $data['error'] ) ? $data['error'] : array();
+		$google_status = sanitize_text_field( $google_error['status'] ?? '' );
+		$message       = ! empty( $google_error['message'] )
+			? sanitize_text_field( $google_error['message'] )
+			/* translators: %d: HTTP status code returned by Google Business Profile. */
+			: sprintf( __( 'Google Business Profile returned HTTP %d.', 'tomawesome-review-widgets' ), $status );
+		$metadata = self::quota_metadata( $google_error );
+
+		if ( self::is_quota_error( $status, $google_status, $message, $metadata ) ) {
+			$error_data = array_merge(
+				array(
+					'status'         => absint( $status ),
+					'google_status'  => $google_status,
+					'google_message' => $message,
+				),
+				$metadata
+			);
+
+			return new \WP_Error(
+				'tarw_business_profile_quota_exceeded',
+				__( 'Google Business Profile API quota is unavailable or temporarily exhausted. For a new project, a zero Requests per minute quota usually means Google has not granted Basic API Access. Check the project quota; if it is zero, apply for Basic API Access. If it is above zero, wait one minute and try again.', 'tomawesome-review-widgets' ),
+				$error_data
+			);
+		}
+
+		return new \WP_Error(
+			'tarw_business_profile_api_error',
+			$message,
+			array(
+				'status'         => absint( $status ),
+				'google_status'  => $google_status,
+				'google_message' => $message,
+			)
+		);
+	}
+
+	/**
+	 * Extracts safe quota metadata from Google's error details.
+	 *
+	 * @param array<string,mixed> $google_error Google error object.
+	 * @return array<string,string>
+	 */
+	private static function quota_metadata( array $google_error ) {
+		$metadata = array();
+		$allowed  = array( 'consumer', 'quota_limit', 'quota_limit_value', 'quota_metric', 'service' );
+		$details  = isset( $google_error['details'] ) && is_array( $google_error['details'] ) ? $google_error['details'] : array();
+
+		foreach ( $details as $detail ) {
+			if ( ! is_array( $detail ) || empty( $detail['metadata'] ) || ! is_array( $detail['metadata'] ) ) {
+				continue;
+			}
+
+			foreach ( $allowed as $key ) {
+				if ( ! isset( $metadata[ $key ] ) && isset( $detail['metadata'][ $key ] ) ) {
+					$metadata[ $key ] = sanitize_text_field( $detail['metadata'][ $key ] );
+				}
+			}
+		}
+
+		return $metadata;
+	}
+
+	/**
+	 * Determines whether Google reported an exhausted request quota.
+	 *
+	 * @param int                  $status HTTP status code.
+	 * @param string               $google_status Google RPC status.
+	 * @param string               $message Google error message.
+	 * @param array<string,string> $metadata Extracted Google quota metadata.
+	 * @return bool
+	 */
+	private static function is_quota_error( $status, $google_status, $message, array $metadata ) {
+		return 429 === absint( $status )
+			|| 'RESOURCE_EXHAUSTED' === strtoupper( $google_status )
+			|| false !== stripos( $message, 'quota exceeded' )
+			|| false !== stripos( $message, 'rate limit exceeded' )
+			|| isset( $metadata['quota_metric'] );
 	}
 
 	/**

@@ -85,6 +85,13 @@
 	scroll-margin-top: 40px;
 }
 
+#tarw-places-compliance {
+	border-top: 1px solid #dcdcde;
+	margin-top: 1rem;
+	padding-top: .5rem;
+	scroll-margin-top: 40px;
+}
+
 .tarw-guide-card > h2 {
 	font-size: 1.45rem;
 }
@@ -159,6 +166,28 @@
 
 .tarw-privacy-panel {
 	border-left: 4px solid #880000;
+}
+
+.tarw-style-panel {
+	background: #f6f7f7;
+	border: 1px solid #c3c4c7;
+	margin: 1rem 0;
+	padding: 1rem 1.25rem;
+}
+
+.tarw-style-panel > h3 {
+	margin-top: 0;
+}
+
+.tarw-style-panel h4 {
+	border-bottom: 1px solid #dcdcde;
+	margin-bottom: .25rem;
+	padding-bottom: .5rem;
+}
+
+.tarw-style-grid .wp-picker-container {
+	display: block;
+	margin-top: .35rem;
 }
 
 .tarw-shortcode {

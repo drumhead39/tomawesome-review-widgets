@@ -37,7 +37,9 @@ These controls cannot determine whether a person is identifiable from context, w
 
 ## Google attribution and API terms
 
-Google's API and attribution requirements apply in addition to privacy law. They can change. Healthcare Privacy Mode preserves business-level “Reviews from Google” attribution, but it deliberately suppresses imported reviewer attribution. Before enabling the mode, the site owner must determine whether that presentation is permitted under the specific Google API agreement and source type in use. If Google's current requirements conflict with the intended de-identification, do not use the mode for that source without appropriate permission or legal review.
+Google's API and attribution requirements apply in addition to privacy law. They can change. As of Google's August 2026 Places policy update, Places reviews must display available author attribution and provide direct access to each individual review on Google Maps. Those requirements conflict with this mode's de-identification controls, so the plugin does not allow Healthcare Privacy Mode with a Google Places source.
+
+Healthcare Privacy Mode remains available for managed Google Business Profile sources. The site owner must still determine whether its presentation is permitted under the applicable Google API agreement and whether publishing the privacy-reviewed copy is lawful.
 
 Relevant Google documents:
 

@@ -146,6 +146,8 @@ This is self-hosted open-source software: each site operator independently owns 
 
 Places mode works without managing the business, but Google currently supplies at most five reviews selected by relevance.
 
+Before publishing Places content, make sure the website provides publicly accessible Terms of Use and a Privacy Policy that incorporate [Google's Terms of Service](https://policies.google.com/terms) and [Google's Privacy Policy](https://policies.google.com/privacy). Do not hide or remove the widget's Google Maps attribution, returned provider attribution, author information, individual-review links, or review-selection/filter notice. Review [Google's current Places policies and attribution requirements](https://developers.google.com/maps/documentation/places/web-service/policies) and the packaged [`PLACES-COMPLIANCE.md`](PLACES-COMPLIANCE.md) guide.
+
 1. In Google Cloud, create or choose a project with billing configured.
 2. Enable **Places API (New)**.
 3. Create an API key.
@@ -155,7 +157,22 @@ Places mode works without managing the business, but Google currently supplies a
 7. Open **Review Widgets > Review Sources > Add New**.
 8. Enter an internal source title, choose **Google Places**, paste the Place ID, publish, and choose **Synchronize now**.
 
+After installing version 0.2.4 or any future update that changes Places attribution handling, synchronize every Places source once. Until that succeeds, the plugin hides its Places widget from visitors and shows administrators a synchronization reminder. This prevents older cached records from being displayed without newly required fields.
+
 Never put the Places API key in a page, shortcode, theme file, or client-side JavaScript. This plugin sends it only in server-side requests.
+
+### Why Places widgets display extra public information
+
+Google's Places policies require a clear review-selection/filter notice in addition to Google Maps attribution, available author attribution, returned data-provider credit, and direct access to each individual source review. Version 0.2.5 places the concise notice beside the Google Maps attribution in the widget footer. Its wording updates automatically when the widget's review count, minimum rating, written-text requirement, or ordering changes.
+
+These are Places-only elements. After Business Profile API access is approved:
+
+1. Connect Google Business Profile under **Review Widgets > Google Connection**.
+2. Discover, import, and synchronize the managed location as a new source. Do not convert the existing Places source.
+3. Edit the widget and select the new managed Business Profile source.
+4. Update the widget.
+
+On the next page load, the plugin automatically removes the Places selection notice, Google Maps Places attribution, returned provider credit, and individual Places-review links. The managed source can retrieve the complete review list, makes reviewer photos optional, and allows Healthcare Privacy Mode.
 
 ## 3. Create a widget
 
@@ -170,12 +187,14 @@ Create additional widgets for other pages, layouts, or businesses. They may reus
 
 ## 4. Healthcare Privacy Mode
 
+Healthcare Privacy Mode cannot be used with a Google Places source because it suppresses author identity while Google Maps requires Places reviews to retain author attribution and individual source links. Use a managed Google Business Profile source for this workflow.
+
 1. Synchronize the source.
 2. Open **Review Widgets > Review Library**.
 3. Read the original review and create privacy-reviewed display copy that removes identifying details.
 4. Complete your organization's authorization and legal review.
 5. Check the approval box and save.
-6. Enable **Healthcare Privacy Mode (HIPAA-conscious)** in the widget.
+6. Enable **Healthcare Privacy Mode (HIPAA-conscious)** in a widget using the managed Business Profile source.
 
 The widget will now show only approved privacy copy and will suppress reviewer identity, photos, profile links, exact dates, and owner responses. Read `HEALTHCARE-PRIVACY-MODE.md` before using the feature.
 
@@ -185,7 +204,8 @@ The widget will now show only approved privacy copy and will suppress reviewer i
 - WordPress Cron runs when the site receives traffic. A low-traffic site can configure a real server cron to request `wp-cron.php`.
 - Imported API content expires after 30 days. An expired review will not display until a successful sync renews it.
 - An OAuth `redirect_uri_mismatch` error means the URI in Google Cloud does not exactly match the URI shown by the plugin.
-- A Business Profile `403` or zero quota normally means the Google Cloud project is not approved, the needed API is disabled, the signed-in user lacks listing access, or Business Profile is disabled by a Workspace administrator.
+- If **Discover managed locations** reports unavailable or exhausted quota, open the linked Account Management API quota page and check **Requests per minute**. A limit of `0` usually means Google has not granted Basic API Access; submit the linked access application and wait for approval. If the limit is above `0`, wait at least one minute and retry. Confirm that the approved project is the same project that owns the OAuth client.
+- A Business Profile `403` without a quota message normally means the needed API is disabled, the signed-in user lacks listing access, or Business Profile is disabled by a Workspace administrator.
 - If WordPress salts change, save the API credentials and reconnect Google because existing encrypted secrets can no longer be decrypted.
 
 Google documentation changes over time. Recheck the [Business Profile setup](https://developers.google.com/my-business/content/basic-setup), [Business Profile policies](https://developers.google.com/my-business/content/policies), and [Places policies](https://developers.google.com/maps/documentation/places/web-service/policies) before production use.

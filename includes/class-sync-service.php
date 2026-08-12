@@ -107,6 +107,17 @@ final class Sync_Service {
 		$this->repository->delete_not_in( $source_id, $external_ids );
 		update_post_meta( $source_id, '_tarw_rating', null === $data['average'] ? '' : (float) $data['average'] );
 		update_post_meta( $source_id, '_tarw_total_review_count', null === $data['total_count'] ? count( $external_ids ) : absint( $data['total_count'] ) );
+		if ( ! empty( $data['business_name'] ) ) {
+			update_post_meta( $source_id, '_tarw_business_name', sanitize_text_field( $data['business_name'] ) );
+		}
+		if ( 'places' === $type ) {
+			update_post_meta( $source_id, '_tarw_place_attributions', $data['attributions'] ?? array() );
+			if ( ! empty( $data['policy_ready'] ) ) {
+				update_post_meta( $source_id, '_tarw_places_policy_sync', '2026-08-07' );
+			} else {
+				delete_post_meta( $source_id, '_tarw_places_policy_sync' );
+			}
+		}
 		update_post_meta( $source_id, '_tarw_last_sync', current_time( 'mysql', true ) );
 		delete_post_meta( $source_id, '_tarw_last_error' );
 
@@ -157,9 +168,10 @@ final class Sync_Service {
 		}
 
 		return array(
-			'reviews'     => $normalized,
-			'average'     => $data['average'],
-			'total_count' => $data['total_count'],
+			'reviews'       => $normalized,
+			'average'       => $data['average'],
+			'total_count'   => $data['total_count'],
+			'business_name' => (string) get_post_meta( $source_id, '_tarw_business_name', true ),
 		);
 	}
 
@@ -176,11 +188,15 @@ final class Sync_Service {
 			return $data;
 		}
 
-		$maps_url   = (string) ( $data['googleMapsUri'] ?? '' );
-		$normalized = array();
+		$maps_url     = (string) ( $data['googleMapsUri'] ?? '' );
+		$display_name = is_array( $data['displayName'] ?? null ) ? (string) ( $data['displayName']['text'] ?? '' ) : '';
+		$normalized   = array();
+		$policy_ready = true;
 		foreach ( $data['reviews'] ?? array() as $review ) {
 			$author       = is_array( $review['authorAttribution'] ?? null ) ? $review['authorAttribution'] : array();
 			$text         = is_array( $review['text'] ?? null ) ? (string) ( $review['text']['text'] ?? '' ) : '';
+			$review_url   = (string) ( $review['googleMapsUri'] ?? '' );
+			$policy_ready = $policy_ready && '' !== $review_url;
 			$normalized[] = array(
 				'external_id'          => (string) ( $review['name'] ?? '' ),
 				'reviewer_name'        => (string) ( $author['displayName'] ?? '' ),
@@ -188,7 +204,7 @@ final class Sync_Service {
 				'reviewer_profile_url' => (string) ( $author['uri'] ?? '' ),
 				'rating'               => min( 5, max( 0, absint( $review['rating'] ?? 0 ) ) ),
 				'review_text'          => $text,
-				'review_url'           => $maps_url,
+				'review_url'           => $review_url,
 				'create_time'          => (string) ( $review['publishTime'] ?? '' ),
 				'update_time'          => (string) ( $review['publishTime'] ?? '' ),
 			);
@@ -198,10 +214,28 @@ final class Sync_Service {
 			update_post_meta( $source_id, '_tarw_review_url', esc_url_raw( $maps_url ) );
 		}
 
+		$attributions = array();
+		foreach ( $data['attributions'] ?? array() as $attribution ) {
+			if ( ! is_array( $attribution ) ) {
+				continue;
+			}
+			$provider = sanitize_text_field( $attribution['provider'] ?? '' );
+			if ( '' === $provider ) {
+				continue;
+			}
+			$attributions[] = array(
+				'provider'     => $provider,
+				'provider_uri' => esc_url_raw( $attribution['providerUri'] ?? '' ),
+			);
+		}
+
 		return array(
-			'reviews'     => $normalized,
-			'average'     => isset( $data['rating'] ) ? (float) $data['rating'] : null,
-			'total_count' => isset( $data['userRatingCount'] ) ? absint( $data['userRatingCount'] ) : null,
+			'reviews'       => $normalized,
+			'average'       => isset( $data['rating'] ) ? (float) $data['rating'] : null,
+			'total_count'   => isset( $data['userRatingCount'] ) ? absint( $data['userRatingCount'] ) : null,
+			'business_name' => $display_name,
+			'attributions'  => $attributions,
+			'policy_ready'  => $policy_ready,
 		);
 	}
 
