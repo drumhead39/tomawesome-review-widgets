@@ -28,8 +28,9 @@ foreach ( $tarw_post_ids as $tarw_post_id ) {
 	wp_delete_post( $tarw_post_id, true );
 }
 
-$tarw_table = $wpdb->prefix . 'tarw_reviews';
-$wpdb->query( "DROP TABLE IF EXISTS {$tarw_table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- The plugin's custom table must be removed directly during an administrator-approved destructive uninstall.
+$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- The plugin's custom table must be removed directly during an administrator-approved destructive uninstall.
+	$wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'tarw_reviews' ) // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- Only removes the plugin-owned table after the explicit delete-on-uninstall opt-in.
+);
 
 delete_option( 'tarw_settings' );
 delete_option( 'tarw_db_version' );

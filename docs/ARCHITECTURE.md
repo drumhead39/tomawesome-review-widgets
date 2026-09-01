@@ -41,6 +41,14 @@ The plugin does not store raw API response payloads, owner responses, visitor an
 - API keys and OAuth tokens never appear in shortcode HTML or front-end JavaScript.
 - Google content expires after 30 days and is deleted when a source is permanently removed.
 
+### Database query review notes
+
+Review upserts, widget retrieval, and opted-in uninstall bind the plugin table name with WordPress's `%i` identifier placeholder, supported by the plugin's WordPress 6.2 minimum. Review values use `%s` and `%d` placeholders. Resynchronization deliberately does not update the separate privacy-approval fields.
+
+`Review_Repository::get_for_widget()` builds its query template exclusively from literal SQL strings. The privacy and written-text branches append fixed predicates; the sort switch selects one of four fixed order clauses and defaults unknown input to newest-first. Neither a caller-supplied clause nor the sort value is interpolated. The complete template is then prepared with its identifier and value arguments.
+
+Plugin Check and WordPress Coding Standards cannot fully trace this literal-only builder. The two narrowly scoped annotations on that query document this reviewed false positive; they must not be broadened or used to permit new raw input. Regression tests cover all sort choices, invalid sort fallback, filter precedence, limits, identifier binding, retained privacy approvals, and the uninstall opt-in gate.
+
 ## Extension points
 
 - `tarw_widget_html` filters final widget HTML and receives the widget ID, source ID, settings, and review rows.

@@ -2,7 +2,16 @@
 
 TomAwesome Review Widgets is a self-hosted WordPress plugin for creating unlimited review shortcodes from multiple Google Business Profile and Places sources.
 
-> Status: 0.2.5 developer preview. The code is structurally complete, but a real approved Google Business Profile project and WordPress staging site are still required for integration and Plugin Check testing before a 1.0.0 release.
+> Status: 1.0.0 stable release. Places and approved managed Business Profile sources have completed real WordPress 7.1 integration testing.
+
+## Google setup is required
+
+The plugin does not display reviews immediately after activation and does not provide shared Google credentials.
+
+- **Places API is the easier, limited path.** It requires Google Cloud billing, Places API (New), an API key, and a Place ID. Google returns at most five reviews selected by relevance.
+- **Managed Business Profile is the advanced, complete path.** It requires a verified managed profile, Google's Basic API Access approval, seven enabled APIs, Google Auth Platform, and an OAuth web client. Approval may take days or longer and is controlled entirely by Google.
+
+Read the complete beginner walkthrough in [docs/INSTALLATION.md](docs/INSTALLATION.md) before installing for managed-business use.
 
 ## Highlights
 
@@ -23,11 +32,12 @@ TomAwesome Review Widgets is a self-hosted WordPress plugin for creating unlimit
 
 ## Quick start
 
-1. Install and activate the plugin on a staging WordPress site.
-2. WordPress opens **Review Widgets > Getting Started** after activation. Choose the managed-business or public Places connection path.
-3. Follow [`docs/INSTALLATION.md`](docs/INSTALLATION.md) when you need the complete Google Cloud walkthrough.
-4. Add or import a source and synchronize it.
-5. Publish a widget and embed `[tomawesome_reviews id="123"]`.
+1. Read the setup-path comparison in [docs/INSTALLATION.md](docs/INSTALLATION.md).
+2. Install and activate the plugin.
+3. WordPress opens **Review Widgets > Getting Started** after activation.
+4. Create and save the Google credentials required by the selected path.
+5. Add or import a source and select **Synchronize now**.
+6. Publish a widget only after that source synchronizes successfully.
 
 Read [`docs/HEALTHCARE-PRIVACY-MODE.md`](docs/HEALTHCARE-PRIVACY-MODE.md) before enabling privacy mode. It is a technical safeguard, not a HIPAA certification or legal advice.
 

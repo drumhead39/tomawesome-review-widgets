@@ -2,13 +2,13 @@
 Contributors: tomawesome
 Tags: reviews, google reviews, testimonials, business profile, healthcare
 Requires at least: 6.2
-Tested up to: 7.0
-Stable tag: 0.2.5
+Tested up to: 7.1
+Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create unlimited, independently configured review widgets for managed Google Business Profile locations and public Places sources.
+Create Google review widgets with your own Business Profile OAuth connection or Places API key. Google setup is required.
 
 == Description ==
 
@@ -16,10 +16,27 @@ TomAwesome Review Widgets lets you connect multiple businesses, synchronize revi
 
 The plugin connects directly from your WordPress server to Google. It does not use a TomAwesome cloud service, does not send review data to the plugin author, and does not include advertising or paid feature gates.
 
+= Before you install: Google setup is required =
+
+This is not a plugin that displays Google reviews immediately after activation.
+
+TomAwesome does not provide a shared API key, preapproved Google Cloud project, OAuth application, or shortcut around Google's approval process. Before any reviews can appear, the site owner must create their own Google connection, add a Review Source, and synchronize it.
+
+There are two very different setup paths:
+
+* **Google Places API — easier, but limited:** Requires a billing-enabled Google Cloud project, Places API (New), an API key, and a Place ID. It does not require Business Profile API approval or OAuth. Google supplies at most five reviews selected by relevance.
+* **Managed Business Profile — advanced, but complete:** Requires an eligible verified Business Profile, a dedicated Google Cloud project, Google's Basic API Access approval, seven enabled Business Profile APIs, Google Auth Platform configuration, and an OAuth web client. It can retrieve the complete paginated review list for locations the connected account owns or manages.
+
+Managed setup is substantially harder and is not a one-click process. Google controls project approval, may take days or longer, and does not guarantee a completion date. Installing this plugin does not begin or accelerate that approval.
+
+If five Google-selected reviews are enough, Places is normally the best starting point. A widget can be switched to a synchronized managed source later.
+
+The complete beginner walkthrough is available after activation under **Review Widgets > Getting Started** and in the project's [installation and Google setup guide](https://github.com/drumhead39/tomawesome-review-widgets/blob/main/docs/INSTALLATION.md).
+
 = Review sources =
 
-* Google Business Profile: for verified locations you own or are authorized to manage. With approved Google API access and OAuth, the plugin can retrieve the complete paginated review list.
-* Google Places API (New): for a public Place ID. Google currently returns at most five reviews selected by Google.
+* Google Business Profile: for verified locations you own or are authorized to manage. With approved Google API access, all required APIs, and OAuth, the plugin can retrieve the complete paginated review list.
+* Google Places API (New): for a public Place ID. Google currently returns at most five reviews selected by relevance.
 
 = Unlimited widget configurations =
 
@@ -89,21 +106,43 @@ Places API policies and attribution: https://developers.google.com/maps/document
 
 TomAwesome Review Widgets is not affiliated with, sponsored by, or endorsed by Google LLC. Google and Google Business Profile are trademarks of Google LLC.
 
+Source code and development documentation: https://github.com/drumhead39/tomawesome-review-widgets
+
 == Installation ==
 
 1. Upload the plugin ZIP through Plugins > Add New > Upload Plugin, or copy the `tomawesome-review-widgets` directory into `/wp-content/plugins/`.
 2. Activate TomAwesome Review Widgets.
-3. WordPress opens Review Widgets > Getting Started with a setup checklist and two connection paths.
-4. Choose a connection method:
-   * For complete reviews from managed businesses, configure an approved Google Business Profile API project and OAuth Web application.
-   * For a public Place, configure a Places API (New) key. Google returns up to five selected reviews.
-5. Add or import at least one Review Source and use Synchronize now. After updating from a version earlier than 0.2.4, synchronize each Places source once to retrieve the current attribution fields and individual review links.
-6. Go to Review Widgets > Add New, name and configure the widget, then publish it.
-7. Copy the generated shortcode into a page, post, or page-builder shortcode element.
+3. Read the warning and connection comparison under Review Widgets > Getting Started.
+4. Choose one setup path:
+   * Easier Places path: create a billing-enabled Google Cloud project, enable Places API (New), create an API key, and find the Place ID.
+   * Advanced managed path: create a dedicated Cloud project, apply for Basic API Access, wait for approval, enable all seven Business Profile APIs, configure Google Auth Platform, and create an OAuth Web application.
+5. Save the credentials under Review Widgets > Google Connection.
+6. Add or import a Review Source.
+7. Open that source and select Synchronize now. Importing a managed location does not download reviews automatically.
+8. Confirm synchronization succeeds before assigning the source to a widget.
+9. Open Review Widgets > Add New, configure and publish the widget, then copy its shortcode into a Shortcode block or page-builder element.
 
-The Getting Started page remains available in the Review Widgets menu. The detailed Google Cloud and OAuth setup guide is also included at `docs/INSTALLATION.md` in the plugin package.
+The Getting Started page remains available in the Review Widgets menu. Read the full [beginner installation and Google setup guide](https://github.com/drumhead39/tomawesome-review-widgets/blob/main/docs/INSTALLATION.md) before attempting managed Business Profile setup.
 
 == Frequently Asked Questions ==
+
+= Will reviews appear immediately after I activate the plugin? =
+
+No. Activation does not contact Google or download reviews. You must configure your own Google credentials, create or import a source, and synchronize that source before a widget can display anything.
+
+= Which setup path should a beginner choose? =
+
+Use Places when five Google-selected reviews are enough. It still requires Google Cloud, billing, Places API (New), an API key, and a Place ID, but it avoids Business Profile project approval and OAuth.
+
+Use the managed Business Profile path only when the connected Google account owns or manages the location and you need the complete review list, multiple managed locations, or Healthcare Privacy Mode.
+
+= How long does managed Business Profile setup take? =
+
+There is no guaranteed timeline. The hands-on configuration requires multiple Google Cloud and OAuth steps, and Google separately reviews the Basic API Access application. Approval may take days or longer. TomAwesome cannot submit, approve, check, or accelerate that application for you.
+
+= Does TomAwesome provide the Google project, API key, or OAuth credentials? =
+
+No. Every site operator creates and controls their own Google Cloud project and credentials. Do not share one approved project or its credentials across unrelated businesses without confirming Google's current requirements.
 
 = Can I create more than one widget? =
 
@@ -152,6 +191,18 @@ No more than 30 days. Successful synchronizations renew the local performance ca
 By default, saved configuration and content remain to prevent accidental data loss. Enable “Delete plugin settings...” under Review Widgets > Google Connection before uninstalling if you want all plugin data removed.
 
 == Changelog ==
+
+= 1.0.0 =
+
+* Promoted the tested plugin to its first stable public release.
+* Added an upfront warning that Google setup is required and reviews do not appear immediately after activation.
+* Clearly separated the easier, limited Places path from the advanced managed Business Profile path.
+* Rewrote the beginner installation guide with click-by-click Google Cloud, billing, API key, Basic API Access, seven-API, OAuth, synchronization, and troubleshooting instructions.
+* Clarified that managed-project approval may take days or longer and cannot be granted or accelerated by the plugin.
+* Documented that importing a managed location creates an empty source until Synchronize now succeeds.
+* Updated the Google Business Profile API list and WordPress 7.1 compatibility metadata.
+* Corrected the unused translation-folder header and database-query Plugin Check warnings while preserving synchronization, filtering, and saved privacy approvals.
+* Made the existing save-nonce verification explicit for static analysis and expanded regression coverage.
 
 = 0.2.5 =
 
@@ -210,6 +261,10 @@ By default, saved configuration and content remain to prevent accidental data lo
 * Added responsive, accessible front-end rendering and reduced-motion support.
 
 == Upgrade Notice ==
+
+= 1.0.0 =
+
+First stable release. Existing credentials, sources, synchronized reviews, widgets, and styling are preserved when updating from 0.2.5.
 
 = 0.2.5 =
 
