@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       TomAwesome Review Widgets
  * Plugin URI:        https://github.com/drumhead39/tomawesome-review-widgets
- * Description:       Create unlimited, independently configured review widgets for Google Business Profile locations and Places sources.
- * Version:           0.2.5
+ * Description:       Create review widgets using your own Google Business Profile connection or Places API key.
+ * Version:           1.0.0
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            TomAwesome
@@ -11,14 +11,13 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       tomawesome-review-widgets
- * Domain Path:       /languages
  *
  * @package TomAwesomeReviewWidgets
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'TARW_VERSION', '0.2.5' );
+define( 'TARW_VERSION', '1.0.0' );
 define( 'TARW_FILE', __FILE__ );
 define( 'TARW_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TARW_URL', plugin_dir_url( __FILE__ ) );

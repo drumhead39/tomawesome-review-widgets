@@ -2,6 +2,20 @@
 
 All notable changes to TomAwesome Review Widgets are documented here.
 
+## 1.0.0 — 2026-08-31
+
+- Promoted the tested plugin to its first stable public release.
+- Added prominent pre-installation and onboarding warnings that Google setup is required and activation alone retrieves no reviews.
+- Reframed Places as the easier, limited path and managed Business Profile as the advanced, complete path.
+- Rewrote the installation guide for first-time Google Cloud users with click-by-click Cloud project, billing, Places key, Basic API Access, seven-API, OAuth, source synchronization, widget, and troubleshooting instructions.
+- Documented that Google controls managed-project approval, may take days or longer, and cannot be accelerated by the plugin.
+- Clarified the difference between importing a managed location and synchronizing its reviews.
+- Removed the retired My Business Q&A API from the required API list.
+- Updated compatibility metadata for WordPress 7.1.
+- Streamlined the public distribution archive while retaining the user-facing setup, privacy, and Places compliance guides.
+- Corrected Plugin Check findings by removing an unused translation-folder header and preparing table identifiers in review upserts, widget retrieval, and uninstall. Documented the scanner's false positive on the widget query's literal-only filter/sort builder with narrow, explained annotations.
+- Made the existing nonce rejection condition explicit for static analysis without changing administrator save permissions; added query, uninstall, and nonce regression tests.
+
 ## 0.2.5 — 2026-08-12
 
 - Shortened the Places review-selection notice and moved it into the footer beside the Google Maps attribution.

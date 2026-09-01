@@ -9,7 +9,7 @@ namespace TomAwesome_Review_Widgets;
 
 defined( 'ABSPATH' ) || exit;
 
-// This repository intentionally uses a plugin-owned custom table. Table names cannot be query placeholders.
+// Direct queries use a plugin-owned custom table; remaining interpolated identifiers are generated internally.
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 /**
@@ -27,30 +27,28 @@ final class Review_Repository {
 	public function upsert( $source_id, array $review ) {
 		global $wpdb;
 
-		$table      = $this->table();
 		$now        = current_time( 'mysql', true );
 		$expires_at = gmdate( 'Y-m-d H:i:s', time() + ( 30 * DAY_IN_SECONDS ) );
 		$create     = $this->mysql_time( $review['create_time'] ?? '' );
 		$update     = $this->mysql_time( $review['update_time'] ?? '' );
 
-		$sql = "INSERT INTO {$table}
-			(source_id, external_id, reviewer_name, reviewer_photo_url, reviewer_profile_url, rating, review_text, review_url, create_time, update_time, privacy_approved, privacy_excerpt, synced_at, expires_at)
-			VALUES (%d, %s, %s, %s, %s, %d, %s, %s, NULLIF(%s, ''), NULLIF(%s, ''), 0, '', %s, %s)
-			ON DUPLICATE KEY UPDATE
-				reviewer_name = VALUES(reviewer_name),
-				reviewer_photo_url = VALUES(reviewer_photo_url),
-				reviewer_profile_url = VALUES(reviewer_profile_url),
-				rating = VALUES(rating),
-				review_text = VALUES(review_text),
-				review_url = VALUES(review_url),
-				create_time = VALUES(create_time),
-				update_time = VALUES(update_time),
-				synced_at = VALUES(synced_at),
-				expires_at = VALUES(expires_at)";
-
 		return $wpdb->query(
 			$wpdb->prepare(
-				$sql, // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The plugin-owned table name cannot be a placeholder; all values use placeholders below.
+				"INSERT INTO %i
+					(source_id, external_id, reviewer_name, reviewer_photo_url, reviewer_profile_url, rating, review_text, review_url, create_time, update_time, privacy_approved, privacy_excerpt, synced_at, expires_at)
+					VALUES (%d, %s, %s, %s, %s, %d, %s, %s, NULLIF(%s, ''), NULLIF(%s, ''), 0, '', %s, %s)
+					ON DUPLICATE KEY UPDATE
+						reviewer_name = VALUES(reviewer_name),
+						reviewer_photo_url = VALUES(reviewer_photo_url),
+						reviewer_profile_url = VALUES(reviewer_profile_url),
+						rating = VALUES(rating),
+						review_text = VALUES(review_text),
+						review_url = VALUES(review_url),
+						create_time = VALUES(create_time),
+						update_time = VALUES(update_time),
+						synced_at = VALUES(synced_at),
+						expires_at = VALUES(expires_at)",
+				$this->table(),
 				absint( $source_id ),
 				sanitize_text_field( $review['external_id'] ?? '' ),
 				sanitize_text_field( $review['reviewer_name'] ?? '' ),
@@ -82,20 +80,41 @@ final class Review_Repository {
 		$limit        = min( 50, max( 1, absint( $args['limit'] ?? 6 ) ) );
 		$privacy_mode = ! empty( $args['privacy_mode'] );
 		$text_only    = ! empty( $args['text_only'] );
-		$order        = $this->order_clause( (string) ( $args['sort'] ?? 'newest' ) );
-		$where        = 'source_id = %d AND rating >= %d AND expires_at > %s';
-		$values       = array( $source_id, $minimum, current_time( 'mysql', true ) );
+		$sql          = 'SELECT * FROM %i WHERE source_id = %d AND rating >= %d AND expires_at > %s';
 
 		if ( $privacy_mode ) {
-			$where .= " AND privacy_approved = 1 AND privacy_excerpt <> ''";
+			$sql .= " AND privacy_approved = 1 AND privacy_excerpt <> ''";
 		} elseif ( $text_only ) {
-			$where .= " AND review_text <> ''";
+			$sql .= " AND review_text <> ''";
 		}
 
-		$sql      = "SELECT * FROM {$this->table()} WHERE {$where} ORDER BY {$order} LIMIT %d";
-		$values[] = $limit;
+		// Sort choices append only fixed SQL, never the caller's sort value.
+		switch ( (string) ( $args['sort'] ?? 'newest' ) ) {
+			case 'oldest':
+				$sql .= ' ORDER BY COALESCE(create_time, update_time) ASC, id ASC';
+				break;
+			case 'highest':
+				$sql .= ' ORDER BY rating DESC, COALESCE(update_time, create_time) DESC';
+				break;
+			case 'random':
+				$sql .= ' ORDER BY RAND()';
+				break;
+			default:
+				$sql .= ' ORDER BY COALESCE(update_time, create_time) DESC, id DESC';
+		}
 
-		return $wpdb->get_results( $wpdb->prepare( $sql, $values ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The table, clauses, and ordering are generated internally; all values use placeholders.
+		$sql .= ' LIMIT %d';
+
+		return $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- The template above contains only literal SQL fragments; the table identifier and every value are bound below.
+			$wpdb->prepare(
+				$sql, // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Only fixed filter/sort clauses are appended above, and every dynamic identifier/value uses a placeholder.
+				$this->table(),
+				$source_id,
+				$minimum,
+				current_time( 'mysql', true ),
+				$limit
+			)
+		);
 	}
 
 	/**
@@ -242,21 +261,5 @@ final class Review_Repository {
 	private function mysql_time( $value ) {
 		$timestamp = strtotime( (string) $value );
 		return false === $timestamp ? '' : gmdate( 'Y-m-d H:i:s', $timestamp );
-	}
-
-	/**
-	 * Returns a fixed safe ORDER BY clause.
-	 *
-	 * @param string $sort Sort option.
-	 * @return string
-	 */
-	private function order_clause( $sort ) {
-		$clauses = array(
-			'newest'  => 'COALESCE(update_time, create_time) DESC, id DESC',
-			'oldest'  => 'COALESCE(create_time, update_time) ASC, id ASC',
-			'highest' => 'rating DESC, COALESCE(update_time, create_time) DESC',
-			'random'  => 'RAND()',
-		);
-		return $clauses[ $sort ] ?? $clauses['newest'];
 	}
 }

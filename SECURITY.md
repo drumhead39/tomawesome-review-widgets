@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-The latest tagged release receives security fixes. Developer-preview builds must be tested on a staging site before production use.
+The latest stable tagged release receives security fixes. Prerelease builds should be tested on a staging site before production use.
 
 ## Reporting a vulnerability
 

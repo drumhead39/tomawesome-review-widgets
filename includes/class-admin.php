@@ -484,7 +484,12 @@ final class Admin {
 		?>
 		<div class="wrap tarw-admin-wrap tarw-onboarding">
 			<h1><?php esc_html_e( 'Welcome to TomAwesome Review Widgets', 'tomawesome-review-widgets' ); ?></h1>
-			<p class="tarw-lead"><?php esc_html_e( 'Follow these steps to connect Google, import reviews, and place your first widget. You can return to this page at any time from Review Widgets > Getting Started.', 'tomawesome-review-widgets' ); ?></p>
+			<p class="tarw-lead"><?php esc_html_e( 'This plugin does not retrieve reviews immediately after activation. First choose a Google connection path, create your own Google credentials, add a review source, and synchronize it. You can return to this page at any time from Review Widgets > Getting Started.', 'tomawesome-review-widgets' ); ?></p>
+
+			<div class="notice notice-warning inline">
+				<p><strong><?php esc_html_e( 'Google setup is required.', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'TomAwesome does not provide a shared API key, Google Cloud project, OAuth application, or shortcut around Google’s approval process. Places setup is the easier path but returns at most five Google-selected reviews. Managed Business Profile setup can retrieve the complete review list, but it is substantially more involved and may require waiting days or longer for Google to approve your project.', 'tomawesome-review-widgets' ); ?></p>
+			</div>
+			<p><a href="https://github.com/drumhead39/tomawesome-review-widgets/blob/main/docs/INSTALLATION.md" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open the complete beginner installation and Google setup guide', 'tomawesome-review-widgets' ); ?></a></p>
 
 			<div class="tarw-admin-card">
 				<h2><?php esc_html_e( 'Setup progress', 'tomawesome-review-widgets' ); ?></h2>
@@ -499,24 +504,26 @@ final class Admin {
 			<h2><?php esc_html_e( '1. Choose how to connect Google', 'tomawesome-review-widgets' ); ?></h2>
 			<div class="tarw-path-grid">
 				<div class="tarw-admin-card tarw-path-card">
-					<p class="tarw-path-label"><?php esc_html_e( 'Recommended for your own business', 'tomawesome-review-widgets' ); ?></p>
-					<h3><?php esc_html_e( 'Managed Business Profile', 'tomawesome-review-widgets' ); ?></h3>
-					<p><?php esc_html_e( 'Use this when your Google account is an owner or manager of the Business Profile. It can retrieve the complete, paginated review list for multiple managed locations.', 'tomawesome-review-widgets' ); ?></p>
-					<p><strong><?php esc_html_e( 'Requires:', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'Google approval for the Cloud project and an OAuth web client.', 'tomawesome-review-widgets' ); ?></p>
-					<p><a class="button button-primary" href="#tarw-managed-setup"><?php esc_html_e( 'Follow the managed-business guide', 'tomawesome-review-widgets' ); ?></a></p>
+					<p class="tarw-path-label"><?php esc_html_e( 'Easier setup — limited reviews', 'tomawesome-review-widgets' ); ?></p>
+					<h3><?php esc_html_e( 'Google Places API', 'tomawesome-review-widgets' ); ?></h3>
+					<p><?php esc_html_e( 'Choose this when five Google-selected reviews are enough or when you do not manage the Business Profile. This path does not require Business Profile API approval or OAuth.', 'tomawesome-review-widgets' ); ?></p>
+					<p><strong><?php esc_html_e( 'What you need:', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'A billing-enabled Google Cloud project, Places API (New), an API key, and the business’s Place ID.', 'tomawesome-review-widgets' ); ?></p>
+					<p><strong><?php esc_html_e( 'What you get:', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'At most five reviews selected by Google, required Google Maps attribution, and no Healthcare Privacy Mode.', 'tomawesome-review-widgets' ); ?></p>
+					<p><a class="button button-primary" href="#tarw-places-setup"><?php esc_html_e( 'Follow the easier Places guide', 'tomawesome-review-widgets' ); ?></a></p>
 				</div>
 				<div class="tarw-admin-card tarw-path-card">
-					<p class="tarw-path-label"><?php esc_html_e( 'Simpler, but limited', 'tomawesome-review-widgets' ); ?></p>
-					<h3><?php esc_html_e( 'Public Places source', 'tomawesome-review-widgets' ); ?></h3>
-					<p><?php esc_html_e( 'Use this for a business you do not manage or when you only need a small sample. Google currently returns at most five reviews selected by relevance.', 'tomawesome-review-widgets' ); ?></p>
-					<p><strong><?php esc_html_e( 'Requires:', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'A billing-enabled Google Cloud project, Places API (New), an API key, and a Place ID.', 'tomawesome-review-widgets' ); ?></p>
-					<p><a class="button" href="#tarw-places-setup"><?php esc_html_e( 'Follow the Places guide', 'tomawesome-review-widgets' ); ?></a></p>
+					<p class="tarw-path-label"><?php esc_html_e( 'Advanced setup — complete reviews', 'tomawesome-review-widgets' ); ?></p>
+					<h3><?php esc_html_e( 'Managed Business Profile', 'tomawesome-review-widgets' ); ?></h3>
+					<p><?php esc_html_e( 'Choose this only when your Google account owns or manages the Business Profile and you need the complete, paginated review list or Healthcare Privacy Mode.', 'tomawesome-review-widgets' ); ?></p>
+					<p><strong><?php esc_html_e( 'What you need:', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'An eligible verified Business Profile, a dedicated Google Cloud project, Google’s Basic API Access approval, seven enabled APIs, a configured OAuth consent screen, and an OAuth web client.', 'tomawesome-review-widgets' ); ?></p>
+					<p><strong><?php esc_html_e( 'Time expectation:', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'This is not a one-click setup. Google controls approval and does not guarantee a completion time, so setup may span multiple sessions and an external waiting period.', 'tomawesome-review-widgets' ); ?></p>
+					<p><a class="button" href="#tarw-managed-setup"><?php esc_html_e( 'Follow the advanced managed-business guide', 'tomawesome-review-widgets' ); ?></a></p>
 				</div>
 			</div>
 
 			<div id="tarw-managed-setup" class="tarw-admin-card tarw-guide-card">
 				<h2><?php esc_html_e( 'Managed Business Profile: step-by-step setup', 'tomawesome-review-widgets' ); ?></h2>
-				<div class="notice notice-info inline"><p><?php esc_html_e( 'Google controls this approval process. Menu names can change, but the linked Google documentation is the authority if a screen differs from this guide.', 'tomawesome-review-widgets' ); ?></p></div>
+				<div class="notice notice-warning inline"><p><strong><?php esc_html_e( 'Allow extra time for this path.', 'tomawesome-review-widgets' ); ?></strong> <?php esc_html_e( 'Creating the Cloud project is only the beginning. Google must separately approve that project for Business Profile API access before location discovery can work. The plugin cannot request, accelerate, or grant that approval. Menu names can change, so the linked Google documentation is authoritative if a screen differs from this guide.', 'tomawesome-review-widgets' ); ?></p></div>
 
 				<h3><?php esc_html_e( 'Before you begin', 'tomawesome-review-widgets' ); ?></h3>
 				<ul>
@@ -533,13 +540,13 @@ final class Admin {
 					</li>
 					<li>
 						<h3><?php esc_html_e( 'Request basic Business Profile API access', 'tomawesome-review-widgets' ); ?></h3>
-						<p><?php esc_html_e( 'With that project selected, open Google’s access form and choose “Application for Basic API Access.” Submit it using the email address that owns or manages the Business Profile. Wait for Google’s approval email before continuing.', 'tomawesome-review-widgets' ); ?></p>
+						<p><?php esc_html_e( 'With that exact project selected, open Google’s access form and choose “Application for Basic API Access.” The form asks for both the text Project ID and numeric Project number. Submit it using the email address that owns or manages the Business Profile. Do not create duplicate applications. Wait for Google’s approval email before continuing; enabling APIs and completing OAuth do not replace this approval.', 'tomawesome-review-widgets' ); ?></p>
 						<p><a href="https://support.google.com/business/contact/api_default" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open the Business Profile API access form', 'tomawesome-review-widgets' ); ?></a> · <a href="https://developers.google.com/my-business/content/prereqs" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Read Google’s current eligibility requirements', 'tomawesome-review-widgets' ); ?></a></p>
-						<p class="description"><?php esc_html_e( 'To check approval later, open APIs & Services > Enabled APIs & services, select a Business Profile API, and inspect Quotas. Google says 0 requests per minute means access is not approved; 300 requests per minute means it is approved.', 'tomawesome-review-widgets' ); ?></p>
+						<p class="description"><?php esc_html_e( 'To check approval later, inspect the My Business Account Management API quota. A Requests per minute limit of 0 means the project is still blocked. Google’s normal Basic API Access approval grants a 300 requests-per-minute quota.', 'tomawesome-review-widgets' ); ?></p>
 					</li>
 					<li>
 						<h3><?php esc_html_e( 'Enable the Business Profile APIs', 'tomawesome-review-widgets' ); ?></h3>
-						<p><?php esc_html_e( 'After approval, open APIs & Services > Library. Search for and enable each API in Google’s current Business Profile suite:', 'tomawesome-review-widgets' ); ?></p>
+						<p><?php esc_html_e( 'After approval, open APIs & Services > Library. Search for each exact name below, open it, and choose Enable. If the button says Manage, that API is already enabled. The Google My Business API may not appear until Google approves the project.', 'tomawesome-review-widgets' ); ?></p>
 						<ul class="tarw-api-list">
 							<li><?php esc_html_e( 'Google My Business API', 'tomawesome-review-widgets' ); ?></li>
 							<li><?php esc_html_e( 'My Business Account Management API', 'tomawesome-review-widgets' ); ?></li>
@@ -548,9 +555,9 @@ final class Admin {
 							<li><?php esc_html_e( 'My Business Notifications API', 'tomawesome-review-widgets' ); ?></li>
 							<li><?php esc_html_e( 'My Business Verifications API', 'tomawesome-review-widgets' ); ?></li>
 							<li><?php esc_html_e( 'My Business Business Information API', 'tomawesome-review-widgets' ); ?></li>
-							<li><?php esc_html_e( 'My Business Q&A API', 'tomawesome-review-widgets' ); ?></li>
 						</ul>
-						<p><a href="https://console.cloud.google.com/apis/library" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open the API Library', 'tomawesome-review-widgets' ); ?></a> · <a href="https://developers.google.com/my-business/content/basic-setup#enable-the-apis" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'See Google’s current API list', 'tomawesome-review-widgets' ); ?></a></p>
+						<p class="description"><?php esc_html_e( 'Location discovery uses the Account Management and Business Information APIs. Review synchronization uses the separate Google My Business API. A location can therefore be discovered successfully while review synchronization still fails if Google My Business API was missed.', 'tomawesome-review-widgets' ); ?></p>
+						<p><a href="https://console.cloud.google.com/apis/library" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open the API Library', 'tomawesome-review-widgets' ); ?></a> · <a href="https://console.cloud.google.com/apis/library/mybusiness.googleapis.com" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open Google My Business API', 'tomawesome-review-widgets' ); ?></a> · <a href="https://developers.google.com/my-business/content/basic-setup#enable-the-apis" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'See Google’s current API list', 'tomawesome-review-widgets' ); ?></a></p>
 					</li>
 					<li>
 						<h3><?php esc_html_e( 'Configure Google Auth Platform', 'tomawesome-review-widgets' ); ?></h3>
@@ -577,7 +584,7 @@ final class Admin {
 					</li>
 					<li>
 						<h3><?php esc_html_e( 'Import and synchronize a location', 'tomawesome-review-widgets' ); ?></h3>
-						<p><?php esc_html_e( 'After the connection succeeds, select Discover managed locations. Add each needed location as a review source. Open the new source, verify its Google links, and select Synchronize now.', 'tomawesome-review-widgets' ); ?></p>
+						<p><?php esc_html_e( 'After the connection succeeds, select Discover managed locations. Choose Add as review source for each needed location. Importing creates an empty source; it does not download reviews automatically. Open the new source, verify its Google links, and select Synchronize now. Do not assign a widget to that source until synchronization reports success.', 'tomawesome-review-widgets' ); ?></p>
 					</li>
 				</ol>
 			</div>
@@ -586,8 +593,8 @@ final class Admin {
 				<h2><?php esc_html_e( 'Public Places: step-by-step setup', 'tomawesome-review-widgets' ); ?></h2>
 				<div class="notice notice-warning inline"><p><?php esc_html_e( 'Before publishing Places content, the website must provide publicly accessible Terms of Use and a Privacy Policy that incorporate Google’s Terms of Service and Privacy Policy. Places widgets must also keep the plugin’s Google Maps, author, provider, filter, and individual-review attributions visible.', 'tomawesome-review-widgets' ); ?></p></div>
 				<ol class="tarw-numbered-guide">
-					<li><h3><?php esc_html_e( 'Prepare Google Cloud', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Create or select a Google Cloud project, attach a billing account, then open APIs & Services > Library and enable Places API (New).', 'tomawesome-review-widgets' ); ?></p></li>
-					<li><h3><?php esc_html_e( 'Create and restrict an API key', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Open APIs & Services > Credentials, create an API key, and restrict its API access to Places API (New). Requests come from the WordPress server, so a browser HTTP-referrer restriction will not work. Use a server IP restriction only if your host provides a stable outbound IP.', 'tomawesome-review-widgets' ); ?></p></li>
+					<li><h3><?php esc_html_e( 'Prepare Google Cloud', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Create or select a Google Cloud project, attach a billing account, then open APIs & Services > Library and enable Places API (New). Confirm the intended project name remains selected in the top bar before each step.', 'tomawesome-review-widgets' ); ?></p><p><a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Create a project', 'tomawesome-review-widgets' ); ?></a> · <a href="https://console.cloud.google.com/billing" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open Billing', 'tomawesome-review-widgets' ); ?></a> · <a href="https://console.cloud.google.com/apis/library/places.googleapis.com" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open Places API (New)', 'tomawesome-review-widgets' ); ?></a></p></li>
+					<li><h3><?php esc_html_e( 'Create and restrict an API key', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Open APIs & Services > Credentials, choose Create credentials > API key, and restrict its API access to Places API (New). Requests come from the WordPress server, so a browser HTTP-referrer restriction will not work. Use a server IP restriction only if your host provides a stable outbound IP.', 'tomawesome-review-widgets' ); ?></p><p><a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open Google Cloud credentials', 'tomawesome-review-widgets' ); ?></a></p></li>
 					<li><h3><?php esc_html_e( 'Save the key', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Open Google Connection, paste the key into Places API key, and save.', 'tomawesome-review-widgets' ); ?></p><p><a class="button" href="<?php echo esc_url( admin_url( 'edit.php?post_type=tarw_widget&page=tarw-settings' ) ); ?>"><?php esc_html_e( 'Open Google Connection', 'tomawesome-review-widgets' ); ?></a></p></li>
 					<li><h3><?php esc_html_e( 'Add and synchronize the source', 'tomawesome-review-widgets' ); ?></h3><p><?php esc_html_e( 'Find the business’s Place ID with Google’s Place ID tool. Then open Review Sources > Add New, choose Google Places, paste the Place ID, publish, and select Synchronize now. Synchronize once after every plugin update that changes Places attribution handling.', 'tomawesome-review-widgets' ); ?></p><p><a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Find a Google Place ID', 'tomawesome-review-widgets' ); ?></a> · <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=tarw_source' ) ); ?>"><?php esc_html_e( 'Add a Review Source', 'tomawesome-review-widgets' ); ?></a></p></li>
 				</ol>
@@ -1306,7 +1313,10 @@ final class Admin {
 			return false;
 		}
 		$nonce = isset( $_POST[ $nonce_field ] ) ? sanitize_text_field( wp_unslash( $_POST[ $nonce_field ] ) ) : '';
-		return '' !== $nonce && wp_verify_nonce( $nonce, $action );
+		if ( '' === $nonce || ! wp_verify_nonce( $nonce, $action ) ) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

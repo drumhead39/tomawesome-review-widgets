@@ -10,3 +10,9 @@
 /composer.lock
 /phpcs.xml.dist
 /phpunit.xml.dist
+/README.md
+/CHANGELOG.md
+/CONTRIBUTING.md
+/SECURITY.md
+/docs/ARCHITECTURE.md
+/docs/WORDPRESS-ORG-RELEASE.md
