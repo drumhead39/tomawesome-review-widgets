@@ -1,5 +1,6 @@
 === TomAwesome Review Widgets ===
 Contributors: tomawesome
+Donate link: https://ko-fi.com/tomawesome
 Tags: reviews, google reviews, testimonials, business profile, healthcare
 Requires at least: 6.2
 Tested up to: 7.1
