@@ -187,6 +187,20 @@ WordPress schedules a daily synchronization. Administrators can also synchronize
 
 No more than 30 days. Successful synchronizations renew the local performance cache. Expired content is removed even after a failed synchronization.
 
+= Why did a previously working widget suddenly become blank? =
+
+The shortcode renders only eligible, unexpired reviews. Google content is stored for no more than 30 days. If daily synchronization repeatedly fails, the stored reviews eventually expire and the public shortcode intentionally returns no review markup. Open the selected Review Source, check **Last successful sync** and **Last error**, then select **Synchronize now**. Do not recreate the page, widget, or shortcode before checking source health.
+
+= What does “Last error: Bad Request” usually mean for a managed source? =
+
+When the connection previously worked, this commonly means Google rejected the saved OAuth refresh token. External OAuth apps left in Testing generally receive refresh tokens that expire after seven days for this scope. Complete Google Auth Platform > Branding, publish the app under Audience according to Google's current requirements, then disconnect and reconnect Google in WordPress. Synchronize the source again after reconnecting. Publishing removes Testing mode's seven-day limitation, but Google can still revoke authorization for other reasons.
+
+= Why is the page still blank after synchronization succeeds? =
+
+A WordPress page cache or hosting/CDN cache may still contain HTML generated while no valid reviews were available. Purge all page caches after the successful synchronization. With WP Super Cache, open Settings > WP Super Cache and select **Delete Cache**. Then check the normal page URL while logged out or in a private browser window.
+
+The complete error-by-error checklist is in the [Troubleshooting Guide](https://github.com/drumhead39/tomawesome-review-widgets/blob/main/docs/TROUBLESHOOTING.md).
+
 = What happens when I uninstall the plugin? =
 
 By default, saved configuration and content remain to prevent accidental data loss. Enable “Delete plugin settings...” under Review Widgets > Google Connection before uninstalling if you want all plugin data removed.
