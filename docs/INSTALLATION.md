@@ -371,14 +371,24 @@ If synchronization reports that **Google My Business API has not been used or is
 
 ## B11. Move beyond OAuth Testing
 
-Testing mode is appropriate while configuring the first connection. However, Google generally expires refresh tokens after seven days when an External app in Testing requests a scope beyond basic identity information.
+Testing mode is appropriate only while configuring and proving the first connection. Google generally expires refresh tokens after seven days when an External app in Testing requests the Business Profile scope. When that token expires, daily synchronization fails. Once the previously synchronized reviews reach their 30-day expiration, the public widget becomes blank.
 
 Before relying on daily synchronization:
 
-1. Open **Google Auth Platform > Audience**.
-2. Review Google's current publishing and verification requirements.
-3. Choose the appropriate production route for the site owner's use case.
-4. Reconnect WordPress if Google requires a new authorization.
+1. Open **Google Auth Platform > Branding** in the same project.
+2. Complete the required application name, support email, website homepage, Privacy Policy URL, authorized domain, and developer contact information. Add optional fields only when they apply.
+3. Save Branding.
+4. Open **Google Auth Platform > Audience**.
+5. Review Google's current publishing and verification requirements for the site owner's use case.
+6. Select **Publish app** or **Push to production** when the project is ready.
+7. Return to **Review Widgets > Google Connection**.
+8. Disconnect the Testing-mode authorization.
+9. Reconnect with the Google account that owns or manages the Business Profile.
+10. Open every managed Review Source and select **Synchronize now**.
+11. Confirm a new **Last successful sync** time and no **Last error**.
+12. Purge any WordPress, host, or CDN page cache that may contain the earlier blank shortcode output.
+
+Production removes Testing mode's seven-day refresh-token limitation, but Google may still revoke authorization for account-security, user-consent, inactivity, credential, or policy reasons. A newly issued Production authorization is required; publishing does not repair an already invalid refresh token.
 
 Each site operator owns and controls their Google Cloud project. Do not share one approved project, client credentials, API key, or indirect API access across unrelated businesses or customer sites without confirming Google's current requirements.
 
@@ -415,24 +425,50 @@ If a widget is changed from a Places source to a managed source, first synchroni
 
 # Troubleshooting
 
+Start with the dedicated [Troubleshooting Guide](TROUBLESHOOTING.md). It covers blank widgets, source status, OAuth errors, Google API errors, 30-day expiration, WordPress Cron, and page caching.
+
 ## The widget shows no reviews
 
-1. Open the selected Review Source.
-2. Check **Last successful sync** or **Last error**.
-3. Select **Synchronize now**.
-4. Confirm the Review Library contains reviews for that source.
-5. Check whether the widget's minimum rating or written-text filter excludes the available reviews.
-6. Clear the page cache after changing the widget.
+1. Do not recreate the page, widget, or shortcode yet.
+2. Open the selected Review Source.
+3. Check **Last successful sync** and **Last error**.
+4. Select **Synchronize now**.
+5. Confirm the Review Library contains reviews for that source.
+6. Check whether the widget's minimum rating, written-text requirement, or Healthcare Privacy Mode approval requirement excludes every available review.
+7. After synchronization succeeds, purge WordPress, hosting, and CDN page caches.
 
-Selecting a newly imported managed source before its first successful synchronization produces an empty widget.
+Selecting a newly imported managed source before its first successful synchronization produces an empty widget. A previously working widget can also become blank after repeated sync failures because Google content expires after 30 days.
+
+## Last error: Bad Request
+
+When a managed source previously worked, this often means Google rejected the saved OAuth refresh token. It is especially common when an External OAuth app remains in Testing beyond seven days.
+
+1. Complete **Google Auth Platform > Branding**.
+2. Open **Audience** and publish the app according to Google's current requirements.
+3. Disconnect Google in WordPress.
+4. Reconnect with the Business Profile Owner or Manager account.
+5. Synchronize every managed source again.
+
+Publishing does not repair an already invalid token; reconnect after publishing. If **Bad Request** continues after a fresh Production authorization, confirm that the OAuth client and approved APIs belong to the same Cloud project, discover managed locations again, and record the complete error before changing saved sources.
+
+## Token has expired or been revoked
+
+Use the same Production-and-reconnect procedure described above. Google may revoke authorization even in Production, so reconnect if the message returns later.
+
+## Synchronization succeeds but the public page remains blank
+
+The plugin renders widgets on the server. A page cache can therefore preserve the empty HTML generated while the source had no valid reviews.
+
+- Purge the WordPress page cache.
+- Purge any host or CDN cache.
+- With WP Super Cache, open **Settings > WP Super Cache** and select **Delete Cache**.
+- Recheck the normal page URL while logged out or in a private window.
+
+A cache-busting query string can help diagnose caching, but it is not a permanent fix.
 
 ## Project quota is 0 QPM
 
 Google has not granted Basic API Access to that project. Enabling APIs and configuring OAuth do not grant Basic API Access. Wait for approval or follow up on the existing case without filing duplicates.
-
-## Token has expired or been revoked
-
-Disconnect and reconnect Google. If the OAuth app is External and in Testing, review the seven-day refresh-token limitation and Google's production requirements.
 
 ## Google My Business API is disabled
 
@@ -456,9 +492,9 @@ Check:
 - A browser HTTP-referrer restriction is not blocking the server-side request.
 - The Place ID is correct.
 
-## Daily synchronization is late
+## Daily synchronization is late or missing
 
-WordPress Cron runs when the website receives traffic. Low-traffic sites may configure a real server cron to request wp-cron.php.
+WordPress Cron runs when the website receives traffic. Low-traffic sites may configure a real server cron to request wp-cron.php. Verify that the source remains enabled for daily synchronization and manually synchronize it before its stored reviews reach the 30-day expiration.
 
 # Data, privacy, and policy responsibilities
 
