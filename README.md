@@ -43,6 +43,8 @@ Read [`docs/HEALTHCARE-PRIVACY-MODE.md`](docs/HEALTHCARE-PRIVACY-MODE.md) before
 
 Read [`docs/PLACES-COMPLIANCE.md`](docs/PLACES-COMPLIANCE.md) before publishing a Places source. It explains every Places-only public element, where it is enforced, and what disappears automatically after a widget switches to a managed Business Profile source.
 
+If a widget previously worked and then becomes blank, or a source reports **Bad Request**, **Token has expired or been revoked**, zero quota, or a disabled API, follow [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md). The guide also explains Google OAuth Testing versus Production, the 30-day content expiration, daily synchronization, and page-cache clearing.
+
 ## Development
 
 Requirements:
