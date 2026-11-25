@@ -61,6 +61,10 @@ jobs:
           wp plugin status "$PLUGIN_SLUG" --path="$site"
           wp eval 'if (!defined(getenv("BOOTSTRAP_CONSTANT"))) { throw new RuntimeException("Plugin bootstrap constant missing"); } echo "Plugin bootstrap loaded successfully\n";' --path="$site"
           wp eval 'echo "WordPress version: " . get_bloginfo("version") . "\n";' --path="$site"
+      - name: Exercise review post types and shortcode fallback
+        run: |
+          set -euo pipefail
+          wp eval 'if (!post_type_exists("tarw_widget") || !post_type_exists("tarw_source") || !shortcode_exists("tomawesome_reviews")) { throw new RuntimeException("Review Widget registration missing"); } wp_set_current_user(1); $id = wp_insert_post(array("post_type" => "tarw_widget", "post_status" => "publish", "post_title" => "Compatibility widget")); if (is_wp_error($id) || !$id) { throw new RuntimeException("Widget fixture creation failed"); } $markup = do_shortcode("[tomawesome_reviews id=\"" . $id . "\"]"); if (false === strpos($markup, "Choose a review source")) { throw new RuntimeException("Shortcode fallback missing"); }' --path="$RUNNER_TEMP/wp72"
       - name: Frontend HTTP smoke
         run: |
           set -euo pipefail
