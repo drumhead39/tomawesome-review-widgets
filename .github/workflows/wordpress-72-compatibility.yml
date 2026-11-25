@@ -1,0 +1,78 @@
+name: WordPress 7.2 compatibility smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wordpress-compatibility:
+    name: WordPress ${{ matrix.wordpress }} / PHP 8.3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        wordpress: ['7.1.5', '7.2-RC3']
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: wordpress
+          MYSQL_ROOT_PASSWORD: wordpress
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pwordpress"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      WP_RELEASE: ${{ matrix.wordpress }}
+      PLUGIN_SLUG: tomawesome-review-widgets
+      BOOTSTRAP_CONSTANT: TARW_VERSION
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli, mbstring, zip
+          coverage: none
+      - name: Install WP-CLI
+        run: |
+          curl --fail --silent --show-error --location https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o wp-cli.phar
+          php wp-cli.phar --info
+          sudo install -m 0755 wp-cli.phar /usr/local/bin/wp
+      - name: Install clean WordPress
+        run: |
+          set -euo pipefail
+          site="$RUNNER_TEMP/wp72"
+          wp core download --version="$WP_RELEASE" --path="$site"
+          wp config create --dbname=wordpress --dbuser=root --dbpass=wordpress --dbhost=127.0.0.1 --path="$site" --skip-check
+          wp core install --url=http://127.0.0.1:8877 --title='Compatibility Test' --admin_user=compat_admin --admin_password='test-only-password-123' --admin_email=qa@example.invalid --skip-email --path="$site"
+          mkdir -p "$site/wp-content/plugins/$PLUGIN_SLUG"
+          rsync -a --exclude=.git --exclude=.github --exclude=vendor --exclude=tests --exclude=docs "$GITHUB_WORKSPACE/" "$site/wp-content/plugins/$PLUGIN_SLUG/"
+      - name: Activate plugin and verify bootstrap
+        run: |
+          set -euo pipefail
+          site="$RUNNER_TEMP/wp72"
+          wp plugin activate "$PLUGIN_SLUG" --path="$site"
+          wp plugin status "$PLUGIN_SLUG" --path="$site"
+          wp eval 'if (!defined(getenv("BOOTSTRAP_CONSTANT"))) { throw new RuntimeException("Plugin bootstrap constant missing"); } echo "Plugin bootstrap loaded successfully\n";' --path="$site"
+          wp eval 'echo "WordPress version: " . get_bloginfo("version") . "\n";' --path="$site"
+      - name: Frontend HTTP smoke
+        run: |
+          set -euo pipefail
+          site="$RUNNER_TEMP/wp72"
+          php -S 127.0.0.1:8877 -t "$site" > "$RUNNER_TEMP/php-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent --show-error --max-time 10 http://127.0.0.1:8877/ -o /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          sed -n '1,120p' "$RUNNER_TEMP/php-server.log"
+          exit 1
